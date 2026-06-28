@@ -1,0 +1,95 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: #0F1208;
+  color: #EFE8D5;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+button { cursor: pointer; font-family: inherit; }
+a { text-decoration: none; color: inherit; }
+input, textarea, select { font-family: inherit; }
+
+.adire {
+  height: 6px;
+  border-radius: 3px;
+  opacity: .7;
+  background: repeating-linear-gradient(
+    90deg,
+    #C8891F 0, #C8891F 4px,
+    transparent 4px, transparent 8px,
+    #A33D21 8px, #A33D21 12px,
+    transparent 12px, transparent 20px
+  );
+}
+.adire-v {
+  width: 6px;
+  flex-shrink: 0;
+  opacity: .7;
+  background: repeating-linear-gradient(
+    180deg,
+    #C8891F 0, #C8891F 4px,
+    transparent 4px, transparent 8px,
+    #A33D21 8px, #A33D21 12px,
+    transparent 12px, transparent 20px
+  );
+}
+
+.photo {
+  background: linear-gradient(155deg, #2A3020 0%, #1E2418 40%, #141914 70%, #0F1208 100%);
+  position: relative;
+  overflow: hidden;
+}
+.photo::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent, transparent 18px,
+    rgba(200,137,31,.04) 18px, rgba(200,137,31,.04) 19px
+  );
+}
+.photo-lbl {
+  position: absolute;
+  bottom: 10px;
+  right: 12px;
+  font-size: 9px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: #3D5030;
+  font-family: monospace;
+}
+
+.hov-card { transition: transform .3s ease, border-color .3s ease; }
+.hov-card:hover { transform: translateY(-4px); border-color: #3D5030 !important; }
+.nav-lnk:hover { color: #EFE8D5 !important; }
+button:active { transform: scale(.97); }
+input:focus { outline: none; border-color: #C8891F !important; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.fu { animation: fadeUp .6s ease-out both; }
+.fu1 { animation-delay: .1s; }
+.fu2 { animation-delay: .25s; }
+.fu3 { animation-delay: .4s; }
+.fu4 { animation-delay: .55s; }
+.fu5 { animation-delay: .7s; }
+.fu6 { animation-delay: .9s; }
+.fi { animation: fadeIn .4s ease-out both; }
+
+@media (max-width: 768px) {
+  .hm { display: none !important; }
+  .sm { flex-direction: column !important; }
+  .fw { width: 100% !important; }
+  .col1 { grid-template-columns: 1fr !important; }
+}
+@media (min-width: 769px) {
+  .hd { display: none !important; }
+}
