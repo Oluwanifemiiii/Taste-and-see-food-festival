@@ -1,6 +1,8 @@
+const P = 'clamp(16px, 4vw, 48px)'
+
 export default function Footer({ onNav }) {
   return (
-    <footer style={{ background: '#0F1208', borderTop: '.5px solid #2A3020', padding: '60px 48px 0' }}>
+    <footer style={{ background: '#0F1208', borderTop: '.5px solid #2A3020', padding: `60px ${P} 0` }}>
       <div style={{ maxWidth: 1440, margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 48, flexWrap: 'wrap', gap: 32 }}>
           <div>
@@ -15,7 +17,7 @@ export default function Footer({ onNav }) {
               </button>
             ))}
           </div>
-          <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
             <button onClick={() => onNav('admin')} className="nav-lnk"
               style={{ background: 'none', border: 'none', fontSize: 10, fontWeight: 600, letterSpacing: '.12em', textTransform: 'uppercase', color: '#3D5030', cursor: 'pointer', transition: 'color .2s' }}>
               Admin Portal →

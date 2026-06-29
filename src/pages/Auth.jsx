@@ -22,7 +22,7 @@ export default function Auth({ onNav }) {
   }
 
   return (
-    <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '100px 20px', background: '#0F1208' }}>
+    <main className="auth-wrap" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(80px,12vh,100px) clamp(16px,4vw,20px)', background: '#0F1208' }}>
       <div style={{ width: '100%', maxWidth: 440 }}>
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
           <div style={{ fontSize: 24, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 4 }}>TASTE &amp; SEE</div>
@@ -36,7 +36,7 @@ export default function Auth({ onNav }) {
           </div>
 
           {tab === 'create' && (
-            <div style={{ padding: 32, display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <div style={{ padding: 'clamp(20px, 4vw, 32px)', display: 'flex', flexDirection: 'column', gap: 20 }}>
               <div><label style={labelStyle}>Full Name</label><input type="text" placeholder="Adaeze Okonkwo" style={inputStyle} /></div>
               <div><label style={labelStyle}>Email Address</label><input type="email" placeholder="you@email.com" style={inputStyle} /></div>
               <div><label style={labelStyle}>Phone Number</label><input type="tel" placeholder="+234 801 234 5678" style={inputStyle} /></div>
@@ -55,14 +55,14 @@ export default function Auth({ onNav }) {
           )}
 
           {tab === 'signin' && (
-            <div style={{ padding: 32, display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <div style={{ padding: 'clamp(20px, 4vw, 32px)', display: 'flex', flexDirection: 'column', gap: 20 }}>
               <div><label style={labelStyle}>Email Address</label><input type="email" placeholder="you@email.com" style={inputStyle} /></div>
               <div><label style={labelStyle}>Password</label><input type="password" placeholder="••••••••" style={inputStyle} /></div>
               <button onClick={() => onNav('checkout')} style={{ width: '100%', background: '#C8891F', color: '#0F1208', border: 'none', borderRadius: 2, padding: 16, fontSize: 12, fontWeight: 600, letterSpacing: '.10em', textTransform: 'uppercase', cursor: 'pointer' }}>
                 Sign In
               </button>
               <p style={{ textAlign: 'center' }}>
-                <button className="nav-lnk" style={{ background: 'none', border: 'none', color: '#C8891F', cursor: 'pointer', fontSize: 13, transition: 'color .2s' }}>Forgot password?</button>
+                <button className="nav-lnk" style={{ background: 'none', border: 'none', color: '#C8891F', cursor: 'pointer', fontSize: 13 }}>Forgot password?</button>
               </p>
               <p style={{ textAlign: 'center', fontSize: 13, color: '#A89B80' }}>
                 New here? <button onClick={() => setTab('create')} style={{ background: 'none', border: 'none', color: '#C8891F', cursor: 'pointer', fontSize: 13 }}>Create an account</button>
@@ -72,7 +72,7 @@ export default function Auth({ onNav }) {
         </div>
 
         <p style={{ textAlign: 'center', marginTop: 20 }}>
-          <button onClick={() => onNav('home')} className="nav-lnk" style={{ background: 'none', border: 'none', color: '#A89B80', cursor: 'pointer', fontSize: 13, transition: 'color .2s' }}>← Back to home</button>
+          <button onClick={() => onNav('home')} className="nav-lnk" style={{ background: 'none', border: 'none', color: '#A89B80', cursor: 'pointer', fontSize: 13 }}>← Back to home</button>
         </p>
       </div>
     </main>

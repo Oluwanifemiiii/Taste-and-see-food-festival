@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { EVENTS, fmt, PRICE_MAP } from '../data/events'
 
+const P = 'clamp(16px, 4vw, 48px)'
+
 export default function EventDetail({ eventId, onNav }) {
   const evt = EVENTS.find(e => e.id === eventId) || EVENTS[0]
   const [selected, setSelected] = useState('premium')
@@ -9,18 +11,21 @@ export default function EventDetail({ eventId, onNav }) {
   const total = PRICE_MAP[selected] * qty
 
   const tkStyle = (key) => ({
-    padding: 16, borderRadius: 8, cursor: 'pointer', border: `1px solid ${selected === key ? (key === 'vip' ? '#A33D21' : '#C8891F') : '#2A3020'}`,
-    background: key === 'vip' ? '#221810' : 'transparent', transition: 'border-color .2s',
+    padding: 16, borderRadius: 8, cursor: 'pointer',
+    border: `1px solid ${selected === key ? (key === 'vip' ? '#A33D21' : '#C8891F') : '#2A3020'}`,
+    background: key === 'vip' ? '#221810' : 'transparent',
+    transition: 'border-color .2s',
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
   })
 
   return (
     <main style={{ minHeight: '100vh', background: '#0F1208' }}>
-      <div className="photo" style={{ height: 440, position: 'relative', paddingTop: 72 }}>
+      {/* Hero banner */}
+      <div className="photo" style={{ height: 'clamp(280px, 45vw, 440px)', position: 'relative', paddingTop: 72 }}>
         <div className="photo-lbl">Event photography</div>
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom,rgba(15,18,8,.25) 0%,rgba(15,18,8,.75) 100%)' }} />
-        <div style={{ position: 'absolute', bottom: 48, left: 48, right: 48 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+        <div className="evt-hero-text" style={{ position: 'absolute', bottom: 48, left: P, right: P }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
             <button onClick={() => onNav('events')} className="nav-lnk"
               style={{ background: 'none', border: 'none', color: '#A89B80', fontSize: 12, letterSpacing: '.08em', textTransform: 'uppercase', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
               ← All Events
@@ -30,20 +35,20 @@ export default function EventDetail({ eventId, onNav }) {
               {evt.type === 'A' ? 'Ethnic Showcase' : 'Old vs New'}
             </span>
           </div>
-          <h1 style={{ fontSize: 'clamp(36px,5vw,56px)', fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 16, lineHeight: 1.1 }}>{evt.title}</h1>
+          <h1 style={{ fontSize: 'clamp(28px, 5vw, 56px)', fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 16, lineHeight: 1.1 }}>{evt.title}</h1>
           <p style={{ fontSize: 14, color: '#A89B80' }}>{evt.date} · {evt.time} · {evt.location}</p>
         </div>
       </div>
 
-      <div style={{ maxWidth: 1300, margin: '0 auto', padding: '60px 48px', display: 'flex', gap: 48, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+      <div style={{ maxWidth: 1300, margin: '0 auto', padding: `clamp(40px, 6vh, 60px) ${P}`, display: 'flex', gap: 48, alignItems: 'flex-start', flexWrap: 'wrap' }}>
         {/* Main content */}
-        <div style={{ flex: .6, minWidth: 300 }}>
+        <div style={{ flex: .6, minWidth: 'min(300px, 100%)' }}>
           <div className="adire" style={{ width: '100%', marginBottom: 40, borderRadius: 0 }} />
           <h2 style={{ fontSize: 24, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 16 }}>About This Event</h2>
           <p style={{ fontSize: 15, lineHeight: 1.75, color: '#A89B80', marginBottom: 48 }}>{evt.desc}</p>
 
           <h3 style={{ fontSize: 20, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 20 }}>Featured Dishes</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 12, marginBottom: 48 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 12, marginBottom: 48 }} className="col1">
             {evt.dishes.map(d => (
               <div key={d} style={{ background: '#1E2418', border: '.5px solid #2A3020', borderRadius: 8, padding: 16, borderLeft: '3px solid #C8891F' }}>
                 <p style={{ fontSize: 13, fontWeight: 600, color: '#EFE8D5' }}>{d}</p>
@@ -52,7 +57,7 @@ export default function EventDetail({ eventId, onNav }) {
           </div>
 
           <h3 style={{ fontSize: 20, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 20 }}>What to Expect</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 12, marginBottom: 48 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 12, marginBottom: 48 }} className="col1">
             {[['🍽', 'Food Tasting'], ['👨‍🍳', 'Live Demonstrations'], ['🥁', 'Cultural Performances'], ['🛒', 'Artisan Marketplace']].map(([icon, label]) => (
               <div key={label} style={{ background: '#1E2418', border: '.5px solid #2A3020', borderRadius: 8, padding: 16, display: 'flex', alignItems: 'center', gap: 12 }}>
                 <span style={{ fontSize: 20 }}>{icon}</span>
@@ -73,7 +78,7 @@ export default function EventDetail({ eventId, onNav }) {
         </div>
 
         {/* Ticket sidebar */}
-        <div style={{ flex: .4, minWidth: 300, position: 'sticky', top: 88 }}>
+        <div style={{ flex: .4, minWidth: 'min(300px, 100%)', position: 'sticky', top: 88, width: '100%' }}>
           <div style={{ background: '#1E2418', border: '.5px solid #2A3020', borderRadius: 12, padding: 28 }}>
             <div style={{ paddingBottom: 18, borderBottom: '.5px solid #2A3020', marginBottom: 18 }}>
               <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '.12em', textTransform: 'uppercase', color: '#A89B80', marginBottom: 6 }}>{evt.date}</p>
@@ -82,11 +87,8 @@ export default function EventDetail({ eventId, onNav }) {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 18 }}>
               <div onClick={() => setSelected('regular')} style={tkStyle('regular')}>
-                <div>
-                  <p style={{ fontSize: 13, fontWeight: 600, color: '#EFE8D5', marginBottom: 3 }}>Regular</p>
-                  <p style={{ fontSize: 11, color: '#A89B80' }}>Entry + food tasting</p>
-                </div>
-                <span style={{ fontSize: 17, fontFamily: "'Yeseva One',serif", color: '#EFE8D5' }}>{fmt(evt.prices.regular)}</span>
+                <div><p style={{ fontSize: 13, fontWeight: 600, color: '#EFE8D5', marginBottom: 3 }}>Regular</p><p style={{ fontSize: 11, color: '#A89B80' }}>Entry + food tasting</p></div>
+                <span style={{ fontSize: 17, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', flexShrink: 0, marginLeft: 8 }}>{fmt(evt.prices.regular)}</span>
               </div>
               <div onClick={() => setSelected('premium')} style={tkStyle('premium')}>
                 <div>
@@ -96,14 +98,11 @@ export default function EventDetail({ eventId, onNav }) {
                   </div>
                   <p style={{ fontSize: 11, color: '#A89B80' }}>Reserved seating + demos</p>
                 </div>
-                <span style={{ fontSize: 17, fontFamily: "'Yeseva One',serif", color: '#C8891F' }}>{fmt(evt.prices.premium)}</span>
+                <span style={{ fontSize: 17, fontFamily: "'Yeseva One',serif", color: '#C8891F', flexShrink: 0, marginLeft: 8 }}>{fmt(evt.prices.premium)}</span>
               </div>
               <div onClick={() => setSelected('vip')} style={tkStyle('vip')}>
-                <div>
-                  <p style={{ fontSize: 13, fontWeight: 600, color: '#EFE8D5', marginBottom: 3 }}>VIP Experience</p>
-                  <p style={{ fontSize: 11, color: '#A89B80' }}>Chef access + lounge</p>
-                </div>
-                <span style={{ fontSize: 17, fontFamily: "'Yeseva One',serif", color: '#A33D21' }}>{fmt(evt.prices.vip)}</span>
+                <div><p style={{ fontSize: 13, fontWeight: 600, color: '#EFE8D5', marginBottom: 3 }}>VIP Experience</p><p style={{ fontSize: 11, color: '#A89B80' }}>Chef access + lounge</p></div>
+                <span style={{ fontSize: 17, fontFamily: "'Yeseva One',serif", color: '#A33D21', flexShrink: 0, marginLeft: 8 }}>{fmt(evt.prices.vip)}</span>
               </div>
             </div>
 

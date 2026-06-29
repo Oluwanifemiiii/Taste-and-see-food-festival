@@ -1,10 +1,11 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
 body {
   background: #0F1208;
   color: #EFE8D5;
   font-family: 'Plus Jakarta Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 button { cursor: pointer; font-family: inherit; }
 a { text-decoration: none; color: inherit; }
@@ -84,12 +85,69 @@ input:focus { outline: none; border-color: #C8891F !important; }
 .fu6 { animation-delay: .9s; }
 .fi { animation: fadeIn .4s ease-out both; }
 
-@media (max-width: 768px) {
-  .hm { display: none !important; }
-  .sm { flex-direction: column !important; }
-  .fw { width: 100% !important; }
-  .col1 { grid-template-columns: 1fr !important; }
-}
+/* ── Desktop hides ── */
 @media (min-width: 769px) {
   .hd { display: none !important; }
+}
+
+/* ── Mobile breakpoint ── */
+@media (max-width: 768px) {
+  .hm  { display: none !important; }
+  .sm  { flex-direction: column !important; }
+  .fw  { width: 100% !important; }
+  .col1 { grid-template-columns: 1fr !important; }
+
+  /* Stat counter row stacks vertically */
+  .stat-row {
+    flex-direction: column !important;
+    gap: 0 !important;
+    bottom: 24px !important;
+  }
+  .stat-cell {
+    padding: 12px 0 !important;
+    border-left: none !important;
+  }
+  .stat-divider { display: none !important; }
+
+  /* Two-experience panels stack */
+  .exp-panels { flex-direction: column !important; }
+  .exp-panels > .adire-v { display: none !important; }
+
+  /* Ticket tier "popular" card — cancel desktop scale */
+  .tier-popular { transform: none !important; }
+
+  /* Team grid — 2 cols on mobile */
+  .team-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
+  /* Mission 3-col grid → 1 col */
+  .mission-grid { grid-template-columns: 1fr !important; }
+
+  /* Format 2-col grid → 1 col */
+  .format-grid { grid-template-columns: 1fr !important; }
+
+  /* Event detail hero text — prevent overflow */
+  .evt-hero-text {
+    left: 16px !important;
+    right: 16px !important;
+    bottom: 24px !important;
+  }
+
+  /* Checkout step indicator — tighter */
+  .step-connector { width: 24px !important; margin: 0 4px !important; }
+  .step-label { display: none !important; }
+
+  /* Timeline photo — don't fix width */
+  .timeline-photo { width: 100% !important; flex-shrink: 1 !important; }
+
+  /* Filter search bar — full width on mobile */
+  .search-bar { margin-left: 0 !important; width: 100% !important; }
+  .search-bar input { width: 100% !important; }
+
+  /* Auth / ticket pages — full padding */
+  .auth-wrap { padding: 80px 16px !important; }
+
+  /* Newsletter row */
+  .newsletter-row { flex-direction: column !important; }
+  .newsletter-row input { border-right: .5px solid #3D5030 !important; border-radius: 2px !important; border-bottom: none !important; }
+  .newsletter-row button { border-radius: 2px !important; }
 }

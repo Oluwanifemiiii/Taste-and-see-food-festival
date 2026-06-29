@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-export default function Nav({ onNav, currentPage }) {
+export default function Nav({ onNav }) {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
 
@@ -22,11 +22,12 @@ export default function Nav({ onNav, currentPage }) {
         transition: 'background .3s, border-bottom .3s',
         background: scrolled ? '#0F1208' : 'transparent',
         borderBottom: scrolled ? '.5px solid #2A3020' : '.5px solid transparent',
-        padding: '0 48px', height: 72,
+        padding: '0 clamp(16px, 4vw, 48px)',
+        height: 72,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <button onClick={() => go('home')} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 3 }}>
-          <span style={{ fontSize: 24, lineHeight: 1, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', letterSpacing: '.02em' }}>TASTE &amp; SEE</span>
+          <span style={{ fontSize: 'clamp(18px, 3vw, 24px)', lineHeight: 1, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', letterSpacing: '.02em' }}>TASTE &amp; SEE</span>
           <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '.22em', textTransform: 'uppercase', color: '#C8891F' }}>FESTIVAL</span>
         </button>
 
@@ -46,7 +47,8 @@ export default function Nav({ onNav, currentPage }) {
           <a href="#" className="nav-lnk" style={{ color: '#A89B80', transition: 'color .2s' }}>
             <svg width="15" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.93a8.18 8.18 0 0 0 4.78 1.52V7.01a4.85 4.85 0 0 1-1.01-.32z"/></svg>
           </a>
-          <button onClick={() => go('checkout')} style={{ background: '#C8891F', color: '#0F1208', border: 'none', borderRadius: 2, padding: '10px 20px', fontSize: 12, fontWeight: 600, letterSpacing: '.10em', textTransform: 'uppercase', cursor: 'pointer', transition: 'background .2s' }}
+          <button onClick={() => go('checkout')}
+            style={{ background: '#C8891F', color: '#0F1208', border: 'none', borderRadius: 2, padding: '10px 20px', fontSize: 12, fontWeight: 600, letterSpacing: '.10em', textTransform: 'uppercase', cursor: 'pointer', transition: 'background .2s' }}
             onMouseOver={e => e.currentTarget.style.background = '#B07A18'}
             onMouseOut={e => e.currentTarget.style.background = '#C8891F'}>
             Get Tickets
@@ -59,7 +61,7 @@ export default function Nav({ onNav, currentPage }) {
       </nav>
 
       {mobileOpen && (
-        <div className="fi" style={{ position: 'fixed', inset: 0, background: '#0F1208', zIndex: 200, display: 'flex', flexDirection: 'column', padding: 40 }}>
+        <div className="fi" style={{ position: 'fixed', inset: 0, background: '#0F1208', zIndex: 200, display: 'flex', flexDirection: 'column', padding: '40px 24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 60 }}>
             <span style={{ fontSize: 22, fontFamily: "'Yeseva One',serif", color: '#EFE8D5' }}>TASTE &amp; SEE</span>
             <button onClick={() => setMobileOpen(false)} style={{ background: 'none', border: 'none', color: '#EFE8D5', cursor: 'pointer' }}>
@@ -68,7 +70,8 @@ export default function Nav({ onNav, currentPage }) {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
             {[['events', 'Events'], ['experience', 'The Experience'], ['about', 'About'], ['auth', 'Tickets']].map(([page, label]) => (
-              <button key={page} onClick={() => go(page)} style={{ background: 'none', border: 'none', fontSize: 36, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', cursor: 'pointer', textAlign: 'left' }}>
+              <button key={page} onClick={() => go(page)}
+                style={{ background: 'none', border: 'none', fontSize: 'clamp(28px, 8vw, 36px)', fontFamily: "'Yeseva One',serif", color: '#EFE8D5', cursor: 'pointer', textAlign: 'left' }}>
                 {label}
               </button>
             ))}
