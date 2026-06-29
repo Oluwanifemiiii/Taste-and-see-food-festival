@@ -195,6 +195,67 @@ export const IMPACT_METRICS = [
 
 export const PARTNERS = ['Lamide Foods', 'Tourism Lagos', 'Culinary Schools Network', 'Farmers Market NG', 'Hospitality Guild', 'Food Creators Hub']
 
+export const MARKETING_CHANNELS = [
+  'Instagram',
+  'TikTok',
+  'YouTube',
+  'Facebook',
+  'X',
+  'Food bloggers',
+  'Celebrity chefs',
+  'Travel influencers',
+]
+
+export const PARTNERSHIP_TYPES = [
+  'Hotels',
+  'Airlines',
+  'Tourism agencies',
+  'Culinary schools',
+  'Restaurants',
+  'Agricultural companies',
+]
+
+export const OPERATIONS_ROLES = [
+  'Festival Director',
+  'Operations Manager',
+  'Marketing Manager',
+  'Vendor Relations Manager',
+  'Finance Manager',
+  'Technical Team',
+  'Event Coordinators',
+  'Volunteer Coordinators',
+]
+
+export const FINANCIAL_PROJECTION = {
+  revenue: [
+    ['Ticket Sales', 52000000],
+    ['Vendor Booths', 39000000],
+    ['Sponsorships', 100000000],
+    ['Merchandise', 15000000],
+    ['Masterclasses', 18000000],
+    ['Digital Content', 10000000],
+  ],
+  expenses: [
+    ['Venue', 40000000],
+    ['Production', 35000000],
+    ['Marketing', 25000000],
+    ['Staff', 30000000],
+    ['Logistics', 20000000],
+    ['Security', 10000000],
+    ['Miscellaneous', 15000000],
+  ],
+}
+
+export const FIVE_YEAR_INITIATIVES = [
+  '100+ food experiences annually',
+  'Pan-African expansion strategy',
+  'International food tours',
+  'Food documentary series',
+  'Taste and See Culinary Museum',
+  'Taste and See Television Network',
+  'Taste and See Awards',
+]
+
 export const fmt = (n) => '₦' + Number(n).toLocaleString('en-NG')
 
 export const PRICE_MAP = Object.fromEntries(Object.entries(TICKET_TIERS).map(([key, tier]) => [key, tier.price]))

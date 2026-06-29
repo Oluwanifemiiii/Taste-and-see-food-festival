@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import Footer from '../components/Footer'
-import { CITIES, MASTERCLASSES, MERCH, PARTNERS, REPORTS, SPONSOR_PACKAGES, VENDOR_PACKAGES, fmt, IMPACT_METRICS } from '../data/events'
+import { CITIES, FINANCIAL_PROJECTION, FIVE_YEAR_INITIATIVES, IMPACT_METRICS, MARKETING_CHANNELS, MASTERCLASSES, MERCH, OPERATIONS_ROLES, PARTNERS, PARTNERSHIP_TYPES, REPORTS, SPONSOR_PACKAGES, VENDOR_PACKAGES, fmt } from '../data/events'
 import { saveLead } from '../services/orders'
 
 const card = {
@@ -169,6 +169,76 @@ export default function Business({ onNav }) {
               ))}
             </div>
           </div>
+        </div>
+      </section>
+
+      <section style={{ padding: '80px 48px', background: '#1E2418' }}>
+        <div style={{ maxWidth: 1440, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48 }} className="col1">
+          <div>
+            <h2 style={{ fontSize: 36, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 24 }}>Marketing Engine</h2>
+            <p style={{ fontSize: 14, lineHeight: 1.8, color: '#A89B80', marginBottom: 22 }}>Digital channels, creator partnerships, and tourism collaborations are built into the platform instead of treated as afterthoughts.</p>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              {MARKETING_CHANNELS.map(channel => <span key={channel} style={{ border: '.5px solid #3D5030', borderRadius: 20, padding: '9px 14px', color: '#A89B80', background: '#0F1208', fontSize: 13 }}>{channel}</span>)}
+            </div>
+          </div>
+          <div>
+            <h2 style={{ fontSize: 36, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 24 }}>Strategic Partnerships</h2>
+            <p style={{ fontSize: 14, lineHeight: 1.8, color: '#A89B80', marginBottom: 22 }}>The business plan depends on hospitality, tourism, education, agriculture, and restaurant partnerships across each expansion city.</p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              {PARTNERSHIP_TYPES.map(item => <div key={item} style={{ ...card, background: '#0F1208', padding: 18, color: '#A89B80', fontSize: 14 }}>{item}</div>)}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section style={{ padding: '80px 48px', maxWidth: 1440, margin: '0 auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48 }} className="col1">
+          <div>
+            <h2 style={{ fontSize: 36, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 24 }}>Operations Team</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              {OPERATIONS_ROLES.map(role => <div key={role} style={{ ...card, padding: 18, color: '#A89B80', fontSize: 14 }}>{role}</div>)}
+            </div>
+          </div>
+          <div>
+            <h2 style={{ fontSize: 36, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 24 }}>Five-Year Roadmap</h2>
+            <div style={{ display: 'grid', gap: 12 }}>
+              {FIVE_YEAR_INITIATIVES.map(item => (
+                <div key={item} style={{ display: 'flex', gap: 14, alignItems: 'center', background: '#1E2418', border: '.5px solid #2A3020', borderRadius: 8, padding: 18 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#C8891F', flexShrink: 0 }} />
+                  <p style={{ color: '#A89B80', fontSize: 14 }}>{item}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section style={{ padding: '80px 48px', background: '#1E2418' }}>
+        <div style={{ maxWidth: 1440, margin: '0 auto' }}>
+          <h2 style={{ fontSize: 36, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 28 }}>Year One Financial Projection</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }} className="col1">
+            {[
+              ['Revenue', FINANCIAL_PROJECTION.revenue],
+              ['Expenses', FINANCIAL_PROJECTION.expenses],
+            ].map(([title, rows]) => {
+              const total = rows.reduce((sum, [, amount]) => sum + amount, 0)
+              return (
+                <div key={title} style={{ ...card, background: '#0F1208' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: 18, marginBottom: 18 }}>
+                    <h3 style={{ fontSize: 24, fontFamily: "'Yeseva One',serif", color: '#EFE8D5' }}>{title}</h3>
+                    <strong style={{ color: '#C8891F', fontSize: 20 }}>{fmt(total)}</strong>
+                  </div>
+                  {rows.map(([label, amount]) => (
+                    <div key={label} style={{ display: 'flex', justifyContent: 'space-between', borderTop: '.5px solid #2A3020', padding: '12px 0', gap: 18 }}>
+                      <span style={{ color: '#A89B80', fontSize: 14 }}>{label}</span>
+                      <strong style={{ color: '#EFE8D5', fontSize: 14 }}>{fmt(amount)}</strong>
+                    </div>
+                  ))}
+                </div>
+              )
+            })}
+          </div>
+          <p style={{ marginTop: 18, fontSize: 15, color: '#C8891F' }}>Projected net surplus: {fmt(59000000)}</p>
         </div>
       </section>
 
