@@ -8,19 +8,24 @@ import Checkout from './pages/Checkout'
 import Ticket from './pages/Ticket'
 import Experience from './pages/Experience'
 import About from './pages/About'
+import Business from './pages/Business'
+import Admin from './pages/Admin'
+import Account from './pages/Account'
 
 export default function App() {
   const [page, setPage] = useState('home')
   const [eventId, setEventId] = useState(1)
   const [ticketType, setTicketType] = useState('premium')
   const [ticketQty, setTicketQty] = useState(1)
+  const [latestOrder, setLatestOrder] = useState(null)
 
   // Navigate and scroll to top
-  const navigate = (target, evtId, ticket, qty) => {
+  const navigate = (target, evtId, ticket, qty, order) => {
     setPage(target)
     if (evtId !== undefined) setEventId(evtId)
     if (ticket !== undefined) setTicketType(ticket)
     if (qty !== undefined) setTicketQty(qty)
+    if (order !== undefined) setLatestOrder(order)
     window.scrollTo(0, 0)
   }
 
@@ -43,9 +48,12 @@ export default function App() {
           onNav={navigate}
         />
       )}
-      {page === 'ticket' && <Ticket eventId={eventId} ticketType={ticketType} onNav={navigate} />}
+      {page === 'ticket' && <Ticket eventId={eventId} ticketType={ticketType} order={latestOrder} onNav={navigate} />}
       {page === 'experience' && <Experience onNav={navigate} />}
       {page === 'about' && <About onNav={navigate} />}
+      {page === 'business' && <Business onNav={navigate} />}
+      {page === 'admin' && <Admin onNav={navigate} />}
+      {page === 'accounts' && <Account onNav={navigate} order={latestOrder} />}
     </>
   )
 }
