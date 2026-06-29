@@ -46,10 +46,16 @@ create table if not exists payment_webhooks (
   payload jsonb not null
 );
 
+create table if not exists admin_users (
+  email text primary key,
+  created_at timestamptz not null default now()
+);
+
 alter table orders enable row level security;
 alter table leads enable row level security;
 alter table event_checkins enable row level security;
 alter table payment_webhooks enable row level security;
+alter table admin_users enable row level security;
 
 create policy "public can create orders"
 on orders for insert
@@ -61,13 +67,40 @@ on leads for insert
 to anon
 with check (true);
 
--- For production, replace this broad read policy with authenticated admin-only access.
-create policy "temporary dashboard read orders"
-on orders for select
-to anon
-using (true);
+create policy "admins can read admin list"
+on admin_users for select
+to authenticated
+using (lower(email) = lower(auth.jwt() ->> 'email'));
 
-create policy "temporary dashboard read leads"
+create policy "admins can read orders"
+on orders for select
+to authenticated
+using (
+  exists (
+    select 1 from admin_users
+    where lower(admin_users.email) = lower(auth.jwt() ->> 'email')
+  )
+);
+
+create policy "admins can read leads"
 on leads for select
-to anon
-using (true);
+to authenticated
+using (
+  exists (
+    select 1 from admin_users
+    where lower(admin_users.email) = lower(auth.jwt() ->> 'email')
+  )
+);
+
+create policy "admins can create checkins"
+on event_checkins for insert
+to authenticated
+with check (
+  exists (
+    select 1 from admin_users
+    where lower(admin_users.email) = lower(auth.jwt() ->> 'email')
+  )
+);
+
+-- Add launch admins after creating their Supabase Auth users:
+-- insert into admin_users (email) values ('founder@example.com');

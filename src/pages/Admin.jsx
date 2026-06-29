@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { EVENTS, fmt } from '../data/events'
-import { isSupabaseConfigured, listRows } from '../services/supabase'
+import { currentUser, isAdminUser, isSupabaseConfigured, listRows } from '../services/supabase'
 
 const box = {
   background: '#1E2418',
@@ -12,11 +12,14 @@ const box = {
 export default function Admin({ onNav }) {
   const [orders, setOrders] = useState([])
   const [leads, setLeads] = useState([])
+  const user = currentUser()
+  const allowed = isAdminUser(user)
 
   useEffect(() => {
+    if (!allowed) return
     listRows('orders').then(setOrders).catch(() => setOrders([]))
     listRows('leads').then(setLeads).catch(() => setLeads([]))
-  }, [])
+  }, [allowed])
 
   const revenue = orders.reduce((sum, order) => sum + Number(order.total || 0), 0)
   const sold = EVENTS.reduce((sum, event) => sum + event.sold, 0) + orders.reduce((sum, order) => sum + Number(order.quantity || 0), 0)
@@ -25,6 +28,16 @@ export default function Admin({ onNav }) {
   return (
     <main style={{ minHeight: '100vh', background: '#0F1208', padding: '120px 48px 80px' }}>
       <div style={{ maxWidth: 1440, margin: '0 auto' }}>
+        {!allowed && (
+          <section style={{ maxWidth: 560, margin: '60px auto', background: '#1E2418', border: '.5px solid #2A3020', borderRadius: 8, padding: 34, textAlign: 'center' }}>
+            <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.18em', textTransform: 'uppercase', color: '#C8891F', marginBottom: 14 }}>Restricted Area</p>
+            <h1 style={{ fontSize: 34, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 12 }}>Admin access required</h1>
+            <p style={{ color: '#A89B80', fontSize: 14, lineHeight: 1.8, marginBottom: 24 }}>Sign in with an email listed in VITE_ADMIN_EMAILS to manage orders, leads, vendors, and event inventory.</p>
+            <button onClick={() => onNav('auth')} style={{ background: '#C8891F', color: '#0F1208', border: 'none', borderRadius: 2, padding: '14px 24px', fontSize: 12, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase' }}>Sign In</button>
+          </section>
+        )}
+        {allowed && (
+        <>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 24, alignItems: 'flex-start', marginBottom: 40, flexWrap: 'wrap' }}>
           <div>
             <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.18em', textTransform: 'uppercase', color: '#C8891F', marginBottom: 14 }}>Operator Console</p>
@@ -91,6 +104,8 @@ export default function Admin({ onNav }) {
             </div>
           </section>
         </div>
+        </>
+        )}
       </div>
     </main>
   )

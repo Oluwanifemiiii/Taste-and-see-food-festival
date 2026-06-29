@@ -14,7 +14,7 @@ export default function Footer({ onNav }) {
               ['business', 'Vendor Booths'],
               ['business', 'Sponsors'],
               ['business', 'Merchandise'],
-              ['about', 'Contact'],
+              ['legal', 'Terms & Privacy'],
             ].map(([page, label], i) => (
               <button key={i} onClick={() => onNav(page)} className="nav-lnk"
                 style={{ background: 'none', border: 'none', fontSize: 13, color: '#A89B80', cursor: 'pointer', transition: 'color .2s' }}>
