@@ -1,16 +1,18 @@
 import { useState } from 'react'
-import { EVENTS } from '../data/events'
+import { CITIES, EVENTS } from '../data/events'
 import EventCard from '../components/EventCard'
 
 const P = 'clamp(16px, 4vw, 48px)'
 
 export default function Events({ onNav }) {
   const [filter, setFilter] = useState('all')
+  const [city, setCity] = useState('all')
   const [search, setSearch] = useState('')
 
   const filtered = EVENTS.filter(e => {
     if (filter === 'ethnic' && e.type !== 'A') return false
     if (filter === 'oldnew' && e.type !== 'B') return false
+    if (city !== 'all' && e.city !== city) return false
     if (search && !e.title.toLowerCase().includes(search.toLowerCase())) return false
     return true
   })
@@ -34,7 +36,12 @@ export default function Events({ onNav }) {
             <button onClick={() => setFilter('all')} style={nbStyle(filter === 'all')}>All</button>
             <button onClick={() => setFilter('ethnic')} style={nbStyle(filter === 'ethnic')}>Ethnic Showcase</button>
             <button onClick={() => setFilter('oldnew')} style={nbStyle(filter === 'oldnew')}>Old vs New</button>
-            <div className="search-bar" style={{ marginLeft: 'auto', background: '#1E2418', border: '.5px solid #3D5030', borderRadius: 2, padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <select value={city} onChange={e => setCity(e.target.value)}
+              style={{ background: '#1E2418', border: '.5px solid #3D5030', borderRadius: 2, padding: '10px 14px', color: '#EFE8D5', fontSize: 13 }}>
+              <option value="all">All Cities</option>
+              {CITIES.map(item => <option key={item} value={item}>{item}</option>)}
+            </select>
+            <div style={{ marginLeft: 'auto', background: '#1E2418', border: '.5px solid #3D5030', borderRadius: 2, padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A89B80" strokeWidth="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               <input type="text" placeholder="Search events..." value={search} onChange={e => setSearch(e.target.value)}
                 style={{ background: 'none', border: 'none', outline: 'none', color: '#EFE8D5', fontSize: 13, width: 'clamp(120px, 20vw, 180px)' }} />

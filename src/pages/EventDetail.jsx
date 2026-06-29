@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { EVENTS, fmt, PRICE_MAP } from '../data/events'
+import { EVENTS, fmt, TICKET_TIERS } from '../data/events'
 
 const P = 'clamp(16px, 4vw, 48px)'
 
@@ -8,7 +8,7 @@ export default function EventDetail({ eventId, onNav }) {
   const [selected, setSelected] = useState('premium')
   const [qty, setQty] = useState(1)
 
-  const total = PRICE_MAP[selected] * qty
+  const total = TICKET_TIERS[selected].price * qty
 
   const tkStyle = (key) => ({
     padding: 16, borderRadius: 8, cursor: 'pointer',
@@ -87,8 +87,11 @@ export default function EventDetail({ eventId, onNav }) {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 18 }}>
               <div onClick={() => setSelected('regular')} style={tkStyle('regular')}>
-                <div><p style={{ fontSize: 13, fontWeight: 600, color: '#EFE8D5', marginBottom: 3 }}>Regular</p><p style={{ fontSize: 11, color: '#A89B80' }}>Entry + food tasting</p></div>
-                <span style={{ fontSize: 17, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', flexShrink: 0, marginLeft: 8 }}>{fmt(evt.prices.regular)}</span>
+                <div>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#EFE8D5', marginBottom: 3 }}>Regular</p>
+                  <p style={{ fontSize: 11, color: '#A89B80' }}>Entry + food tasting</p>
+                </div>
+                <span style={{ fontSize: 17, fontFamily: "'Yeseva One',serif", color: '#EFE8D5' }}>{fmt(TICKET_TIERS.regular.price)}</span>
               </div>
               <div onClick={() => setSelected('premium')} style={tkStyle('premium')}>
                 <div>
@@ -98,11 +101,14 @@ export default function EventDetail({ eventId, onNav }) {
                   </div>
                   <p style={{ fontSize: 11, color: '#A89B80' }}>Reserved seating + demos</p>
                 </div>
-                <span style={{ fontSize: 17, fontFamily: "'Yeseva One',serif", color: '#C8891F', flexShrink: 0, marginLeft: 8 }}>{fmt(evt.prices.premium)}</span>
+                <span style={{ fontSize: 17, fontFamily: "'Yeseva One',serif", color: '#C8891F' }}>{fmt(TICKET_TIERS.premium.price)}</span>
               </div>
               <div onClick={() => setSelected('vip')} style={tkStyle('vip')}>
-                <div><p style={{ fontSize: 13, fontWeight: 600, color: '#EFE8D5', marginBottom: 3 }}>VIP Experience</p><p style={{ fontSize: 11, color: '#A89B80' }}>Chef access + lounge</p></div>
-                <span style={{ fontSize: 17, fontFamily: "'Yeseva One',serif", color: '#A33D21', flexShrink: 0, marginLeft: 8 }}>{fmt(evt.prices.vip)}</span>
+                <div>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#EFE8D5', marginBottom: 3 }}>VIP Experience</p>
+                  <p style={{ fontSize: 11, color: '#A89B80' }}>Chef access + lounge</p>
+                </div>
+                <span style={{ fontSize: 17, fontFamily: "'Yeseva One',serif", color: '#A33D21' }}>{fmt(TICKET_TIERS.vip.price)}</span>
               </div>
             </div>
 

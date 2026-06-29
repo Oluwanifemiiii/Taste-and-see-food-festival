@@ -1,4 +1,4 @@
-import { fmt } from '../data/events'
+import { fmt, TICKET_TIERS } from '../data/events'
 
 export default function EventCard({ evt, onNavigate, layout = 'grid' }) {
   const badgeBg = evt.type === 'A' ? '#C8891F' : '#A33D21'
@@ -23,7 +23,7 @@ export default function EventCard({ evt, onNavigate, layout = 'grid' }) {
           <h3 style={{ fontSize: 20, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', lineHeight: 1.3 }}>{evt.title}</h3>
           <p style={{ fontSize: 13, color: '#A89B80' }}>{evt.date} · {evt.shortLoc}</p>
           <div style={{ display: 'flex', gap: 20, padding: '12px 0', borderTop: '.5px solid #2A3020', borderBottom: '.5px solid #2A3020' }}>
-            {[['Regular', evt.prices.regular, '#EFE8D5'], ['Premium', evt.prices.premium, '#C8891F'], ['VIP', evt.prices.vip, '#EFE8D5']].map(([label, price, color]) => (
+            {[['Regular', TICKET_TIERS.regular.price, '#EFE8D5'], ['Premium', TICKET_TIERS.premium.price, '#C8891F'], ['VIP', TICKET_TIERS.vip.price, '#EFE8D5']].map(([label, price, color]) => (
               <div key={label}>
                 <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '.08em', color: '#A89B80', marginBottom: 4 }}>{label}</div>
                 <div style={{ fontSize: 15, fontFamily: "'Yeseva One',serif", color }}>{fmt(price)}</div>
@@ -62,7 +62,7 @@ export default function EventCard({ evt, onNavigate, layout = 'grid' }) {
         <h3 style={{ fontSize: 22, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 10, lineHeight: 1.3 }}>{evt.title}</h3>
         <p style={{ fontSize: 13, lineHeight: 1.6, color: '#A89B80', marginBottom: 20 }}>{evt.desc}</p>
         <div style={{ display: 'flex', gap: 20, padding: '14px 0', borderTop: '.5px solid #2A3020', borderBottom: '.5px solid #2A3020', marginBottom: 16 }}>
-          {[['Regular', evt.prices.regular, '#EFE8D5'], ['Premium', evt.prices.premium, '#C8891F'], ['VIP', evt.prices.vip, '#EFE8D5']].map(([label, price, color]) => (
+          {[['Regular', TICKET_TIERS.regular.price, '#EFE8D5'], ['Premium', TICKET_TIERS.premium.price, '#C8891F'], ['VIP', TICKET_TIERS.vip.price, '#EFE8D5']].map(([label, price, color]) => (
             <div key={label}>
               <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '.08em', color: '#A89B80', marginBottom: 4 }}>{label}</div>
               <div style={{ fontSize: 15, fontFamily: "'Yeseva One',serif", color }}>{fmt(price)}</div>

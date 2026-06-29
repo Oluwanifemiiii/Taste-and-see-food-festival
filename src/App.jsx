@@ -8,21 +8,78 @@ import Checkout from './pages/Checkout'
 import Ticket from './pages/Ticket'
 import Experience from './pages/Experience'
 import About from './pages/About'
+import Business from './pages/Business'
+import Admin from './pages/Admin'
+import Account from './pages/Account'
+import Legal from './pages/Legal'
+
+function routeFromPath(pathname) {
+  const parts = pathname.split('/').filter(Boolean)
+  if (!parts.length) return { page: 'home' }
+  if (parts[0] === 'events' && parts[1]) return { page: 'event-detail', eventId: Number(parts[1]) || 1 }
+  if (parts[0] === 'checkout') return { page: 'checkout', eventId: Number(parts[1]) || 1 }
+  if (parts[0] === 'ticket') return { page: 'ticket', eventId: Number(parts[1]) || 1 }
+  const routes = {
+    events: 'events',
+    experience: 'experience',
+    about: 'about',
+    business: 'business',
+    auth: 'auth',
+    account: 'accounts',
+    accounts: 'accounts',
+    admin: 'admin',
+    legal: 'legal',
+  }
+  return { page: routes[parts[0]] || 'home' }
+}
+
+function pathForRoute(page, eventId) {
+  const routes = {
+    home: '/',
+    events: '/events',
+    'event-detail': `/events/${eventId || 1}`,
+    checkout: `/checkout/${eventId || 1}`,
+    ticket: `/ticket/${eventId || 1}`,
+    experience: '/experience',
+    about: '/about',
+    business: '/business',
+    auth: '/auth',
+    accounts: '/account',
+    admin: '/admin',
+    legal: '/legal',
+  }
+  return routes[page] || '/'
+}
 
 export default function App() {
-  const [page, setPage] = useState('home')
-  const [eventId, setEventId] = useState(1)
+  const initialRoute = routeFromPath(window.location.pathname)
+  const [page, setPage] = useState(initialRoute.page)
+  const [eventId, setEventId] = useState(initialRoute.eventId || 1)
   const [ticketType, setTicketType] = useState('premium')
   const [ticketQty, setTicketQty] = useState(1)
+  const [latestOrder, setLatestOrder] = useState(null)
 
   // Navigate and scroll to top
-  const navigate = (target, evtId, ticket, qty) => {
+  const navigate = (target, evtId, ticket, qty, order) => {
     setPage(target)
     if (evtId !== undefined) setEventId(evtId)
     if (ticket !== undefined) setTicketType(ticket)
     if (qty !== undefined) setTicketQty(qty)
+    if (order !== undefined) setLatestOrder(order)
+    window.history.pushState({}, '', pathForRoute(target, evtId ?? eventId))
     window.scrollTo(0, 0)
   }
+
+  useEffect(() => {
+    const onPop = () => {
+      const route = routeFromPath(window.location.pathname)
+      setPage(route.page)
+      if (route.eventId) setEventId(route.eventId)
+      window.scrollTo(0, 0)
+    }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
 
   // Pages that hide the nav (full-screen flows)
   const hideNav = ['ticket'].includes(page)
@@ -43,9 +100,13 @@ export default function App() {
           onNav={navigate}
         />
       )}
-      {page === 'ticket' && <Ticket eventId={eventId} ticketType={ticketType} onNav={navigate} />}
+      {page === 'ticket' && <Ticket eventId={eventId} ticketType={ticketType} order={latestOrder} onNav={navigate} />}
       {page === 'experience' && <Experience onNav={navigate} />}
       {page === 'about' && <About onNav={navigate} />}
+      {page === 'business' && <Business onNav={navigate} />}
+      {page === 'admin' && <Admin onNav={navigate} />}
+      {page === 'accounts' && <Account onNav={navigate} order={latestOrder} />}
+      {page === 'legal' && <Legal onNav={navigate} />}
     </>
   )
 }
