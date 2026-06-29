@@ -8,7 +8,14 @@ export default function Footer({ onNav }) {
             <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: '.22em', textTransform: 'uppercase', color: '#C8891F' }}>FESTIVAL BY LAMIDE FOODS</div>
           </div>
           <div style={{ display: 'flex', gap: 28, flexWrap: 'wrap', alignItems: 'center' }}>
-            {[['events', 'Events'], ['about', 'About'], ['experience', 'Masterclasses'], ['experience', 'Vendor Booths'], ['about', 'Contact'], ['about', 'Privacy']].map(([page, label], i) => (
+            {[
+              ['events', 'Events'],
+              ['business', 'Masterclasses'],
+              ['business', 'Vendor Booths'],
+              ['business', 'Sponsors'],
+              ['business', 'Merchandise'],
+              ['legal', 'Terms & Privacy'],
+            ].map(([page, label], i) => (
               <button key={i} onClick={() => onNav(page)} className="nav-lnk"
                 style={{ background: 'none', border: 'none', fontSize: 13, color: '#A89B80', cursor: 'pointer', transition: 'color .2s' }}>
                 {label}
@@ -27,7 +34,7 @@ export default function Footer({ onNav }) {
           </div>
         </div>
         <div style={{ borderTop: '.5px solid #2A3020', padding: '20px 0' }}>
-          <p style={{ fontSize: 11, color: '#4A5C3E', letterSpacing: '.05em' }}>© 2025 Lamide Foods. All Rights Reserved.</p>
+          <p style={{ fontSize: 11, color: '#4A5C3E', letterSpacing: '.05em' }}>© 2026 Lamide Foods. All Rights Reserved.</p>
         </div>
       </div>
       <div className="adire" style={{ width: '100%', borderRadius: 0 }} />

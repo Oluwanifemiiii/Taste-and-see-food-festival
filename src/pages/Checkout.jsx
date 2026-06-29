@@ -1,159 +1,198 @@
 import { useState } from 'react'
-import { EVENTS, fmt, PRICE_MAP } from '../data/events'
+import { EVENTS, TICKET_TIERS, fmt } from '../data/events'
+import { makeReference, saveOrder } from '../services/orders'
+import { isPaystackConfigured, startPaystackPayment } from '../services/paystack'
+
+const inputStyle = {
+  width: '100%',
+  background: '#252C1A',
+  border: '.5px solid #3D5030',
+  borderRadius: 4,
+  padding: '14px 16px',
+  color: '#EFE8D5',
+  fontSize: 14,
+  outline: 'none',
+}
+
+const labelStyle = {
+  display: 'block',
+  fontSize: 10,
+  fontWeight: 700,
+  letterSpacing: '.15em',
+  textTransform: 'uppercase',
+  color: '#A89B80',
+  marginBottom: 8,
+}
 
 export default function Checkout({ eventId, initialTicket, initialQty, onNav }) {
-  const [step, setStep] = useState(2)
+  const evt = EVENTS.find(e => e.id === eventId) || EVENTS[0]
+  const [step, setStep] = useState(1)
   const [selected, setSelected] = useState(initialTicket || 'premium')
   const [qty, setQty] = useState(initialQty || 1)
-
-  const evt = EVENTS.find(e => e.id === eventId) || EVENTS[0]
-  const subtotal = PRICE_MAP[selected] * qty
-  const tax = Math.round(subtotal * 0.075)
-  const total = subtotal + tax
-  const ticketLabel = { regular: 'Regular', premium: 'Premium', vip: 'VIP Experience' }[selected]
-
-  const stepCircle = (n) => ({
-    width: 32, height: 32, borderRadius: '50%',
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    background: step >= n ? '#C8891F' : '#2A3020',
-    color: step >= n ? '#0F1208' : '#A89B80',
-    fontSize: 13, fontWeight: 600, fontFamily: "'Plus Jakarta Sans',sans-serif",
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [confirmedOrder, setConfirmedOrder] = useState(null)
+  const [attendee, setAttendee] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    dietary: '',
   })
 
-  const inputStyle = {
-    width: '100%', background: '#252C1A', border: '.5px solid #3D5030',
-    borderRadius: 4, padding: '14px 16px', color: '#EFE8D5', fontSize: 14, outline: 'none',
+  const subtotal = TICKET_TIERS[selected].price * qty
+  const vat = Math.round(subtotal * 0.075)
+  const total = subtotal + vat
+
+  const pay = async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const reference = makeReference('TSF')
+      const payment = await startPaystackPayment({
+        email: attendee.email,
+        amount: total,
+        reference,
+        metadata: {
+          event_id: evt.id,
+          event_title: evt.title,
+          ticket_type: selected,
+          quantity: qty,
+          attendee_name: attendee.name,
+        },
+      })
+
+      const order = await saveOrder({
+        reference: payment.reference || reference,
+        payment_status: payment.status || 'success',
+        event_id: evt.id,
+        event_title: evt.title,
+        ticket_type: selected,
+        quantity: qty,
+        subtotal,
+        vat,
+        total,
+        attendee_name: attendee.name,
+        attendee_email: attendee.email,
+        attendee_phone: attendee.phone,
+        dietary: attendee.dietary,
+      })
+
+      setConfirmedOrder(order)
+      setStep(4)
+    } catch (err) {
+      setError(err.message || 'Payment could not be completed.')
+    } finally {
+      setLoading(false)
+    }
   }
-  const labelStyle = {
-    display: 'block', fontSize: 10, fontWeight: 600, letterSpacing: '.15em',
-    textTransform: 'uppercase', color: '#A89B80', marginBottom: 8,
-  }
+
+  const canContinue = attendee.name && attendee.email && attendee.phone
 
   return (
     <main style={{ minHeight: '100vh', background: '#0F1208', padding: '100px 48px 80px' }}>
-      <div style={{ maxWidth: 900, margin: '0 auto' }}>
-        {/* Step indicator */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 60, flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ ...stepCircle(1), background: '#C8891F' }}>
-              <svg width="14" height="10" viewBox="0 0 24 16" fill="none" stroke="#0F1208" strokeWidth="3"><path d="M2 8l6 6L22 2"/></svg>
-            </div>
-            <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '.10em', textTransform: 'uppercase', color: '#C8891F' }}>Select Ticket</span>
-          </div>
-          {[
-            [2, 'Your Details'],
-            [3, 'Payment'],
-            [4, 'Confirm'],
-          ].map(([n, label]) => (
-            <div key={n} style={{ display: 'flex', alignItems: 'center' }}>
-              <div style={{ width: 60, height: .5, background: '#3D5030', margin: '0 8px' }} />
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <div style={stepCircle(n)}>{n}</div>
-                <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '.10em', textTransform: 'uppercase', color: step >= n ? '#C8891F' : '#A89B80' }}>{label}</span>
-              </div>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginBottom: 48, flexWrap: 'wrap' }}>
+          {['Select Ticket', 'Your Details', 'Payment', 'Confirm'].map((label, index) => (
+            <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+              <span style={{ width: 30, height: 30, borderRadius: '50%', display: 'grid', placeItems: 'center', background: step >= index + 1 ? '#C8891F' : '#2A3020', color: step >= index + 1 ? '#0F1208' : '#A89B80', fontSize: 12, fontWeight: 700 }}>{index + 1}</span>
+              <span style={{ fontSize: 11, letterSpacing: '.10em', textTransform: 'uppercase', color: step >= index + 1 ? '#C8891F' : '#A89B80' }}>{label}</span>
             </div>
           ))}
         </div>
 
-        {/* Step 2 — Details */}
-        {step === 2 && (
-          <div>
-            <h2 style={{ fontSize: 32, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 8 }}>Your Details</h2>
-            <p style={{ fontSize: 15, color: '#A89B80', marginBottom: 40 }}>Confirm your information and we'll have your tickets ready.</p>
-            <div style={{ background: '#1E2418', border: '.5px solid #2A3020', borderRadius: 12, padding: 32, display: 'flex', flexDirection: 'column', gap: 20, marginBottom: 24 }}>
-              <div><label style={labelStyle}>Full Name</label><input type="text" defaultValue="Adaeze Okonkwo" style={inputStyle} /></div>
-              <div><label style={labelStyle}>Email Address</label><input type="email" defaultValue="adaeze@email.com" style={inputStyle} /></div>
-              <div><label style={labelStyle}>Phone Number</label><input type="tel" defaultValue="+234 801 234 5678" style={inputStyle} /></div>
-              <div>
-                <label style={labelStyle}>Dietary Requirements <span style={{ fontWeight: 400, color: '#4A5C3E' }}>(Optional)</span></label>
-                <input type="text" placeholder="Vegetarian, nut allergy, etc." style={inputStyle} />
-              </div>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <button onClick={() => setStep(3)} style={{ background: '#C8891F', color: '#0F1208', border: 'none', borderRadius: 2, padding: '16px 40px', fontSize: 12, fontWeight: 600, letterSpacing: '.10em', textTransform: 'uppercase', cursor: 'pointer' }}>Continue →</button>
-            </div>
-          </div>
-        )}
-
-        {/* Step 3 — Payment */}
-        {step === 3 && (
-          <div style={{ display: 'flex', gap: 40, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-            <div style={{ flex: .6, minWidth: 280 }}>
-              <h2 style={{ fontSize: 32, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 32 }}>Payment</h2>
-              <div style={{ background: '#1E2418', border: '.5px solid #2A3020', borderRadius: 12, padding: 32 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24, paddingBottom: 20, borderBottom: '.5px solid #2A3020' }}>
-                  <div style={{ width: 36, height: 22, background: '#00457C', borderRadius: 3, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span style={{ fontSize: 8, fontWeight: 700, color: '#fff', letterSpacing: '.04em' }}>PAY</span>
-                  </div>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: '#EFE8D5' }}>Paystack Secure Checkout</span>
-                  <svg width="12" height="14" viewBox="0 0 24 24" fill="none" stroke="#6DB86D" strokeWidth="1.5" style={{ marginLeft: 'auto' }}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                </div>
-
-                {/* Paystack integration placeholder */}
-                <div style={{ background: '#252C1A', border: '1px dashed #3D5030', borderRadius: 8, padding: '32px 24px', textAlign: 'center', marginBottom: 24 }}>
-                  <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#1E2418', border: '.5px solid #3D5030', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C8891F" strokeWidth="1.5"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                  </div>
-                  <p style={{ fontSize: 14, fontWeight: 600, color: '#EFE8D5', marginBottom: 6 }}>Paystack Payment Window</p>
-                  <p style={{ fontSize: 12, color: '#A89B80', lineHeight: 1.6 }}>The Paystack payment widget will appear here once the backend integration is connected. Card, bank transfer, and USSD payment methods will be available.</p>
-                </div>
-
-                <button onClick={() => setStep(4)} style={{ width: '100%', background: '#C8891F', color: '#0F1208', border: 'none', borderRadius: 2, padding: 18, fontSize: 13, fontWeight: 600, letterSpacing: '.10em', textTransform: 'uppercase', cursor: 'pointer' }}>
-                  Pay {fmt(total)} →
+        {step === 1 && (
+          <section>
+            <h1 style={{ fontSize: 40, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 8 }}>Choose your ticket</h1>
+            <p style={{ color: '#A89B80', marginBottom: 32 }}>{evt.title} • {evt.date} • {evt.city}</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 20, marginBottom: 28 }} className="col1">
+              {Object.entries(TICKET_TIERS).map(([key, tier]) => (
+                <button key={key} onClick={() => setSelected(key)}
+                  style={{ textAlign: 'left', background: key === selected ? '#252C1A' : '#1E2418', border: `1px solid ${key === selected ? '#C8891F' : '#2A3020'}`, borderRadius: 8, padding: 28, color: '#EFE8D5' }}>
+                  <p style={{ fontSize: 10, letterSpacing: '.16em', textTransform: 'uppercase', color: key === selected ? '#C8891F' : '#A89B80', marginBottom: 12 }}>{tier.label}</p>
+                  <p style={{ fontSize: 36, fontFamily: "'Yeseva One',serif", color: key === 'vip' ? '#A33D21' : '#C8891F', marginBottom: 18 }}>{fmt(tier.price)}</p>
+                  {tier.benefits.map(benefit => <p key={benefit} style={{ fontSize: 13, color: '#A89B80', lineHeight: 1.8 }}>• {benefit}</p>)}
                 </button>
-              </div>
+              ))}
             </div>
-
-            {/* Order summary */}
-            <div style={{ flex: .4, minWidth: 260, background: '#1E2418', border: '.5px solid #2A3020', borderRadius: 12, padding: 28, position: 'sticky', top: 88 }}>
-              <h3 style={{ fontSize: 16, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 20 }}>Order Summary</h3>
-              <div style={{ marginBottom: 18, paddingBottom: 18, borderBottom: '.5px solid #2A3020' }}>
-                <p style={{ fontSize: 13, fontWeight: 600, color: '#EFE8D5', marginBottom: 4 }}>{evt.title}</p>
-                <p style={{ fontSize: 12, color: '#A89B80' }}>{evt.date}</p>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 18, paddingBottom: 18, borderBottom: '.5px solid #2A3020' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 13, color: '#A89B80' }}>{ticketLabel} × {qty}</span>
-                  <span style={{ fontSize: 13, color: '#EFE8D5' }}>{fmt(subtotal)}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 13, color: '#A89B80' }}>VAT (7.5%)</span>
-                  <span style={{ fontSize: 13, color: '#EFE8D5' }}>{fmt(tax)}</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 20, background: '#1E2418', border: '.5px solid #2A3020', borderRadius: 8, padding: 20, flexWrap: 'wrap' }}>
+              <div>
+                <p style={{ fontSize: 11, letterSpacing: '.14em', textTransform: 'uppercase', color: '#A89B80', marginBottom: 6 }}>Quantity</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <button onClick={() => setQty(q => Math.max(1, q - 1))} style={{ width: 38, height: 38, borderRadius: 4, border: '.5px solid #3D5030', background: '#252C1A', color: '#EFE8D5', fontSize: 18 }}>-</button>
+                  <strong style={{ minWidth: 34, textAlign: 'center', fontSize: 20 }}>{qty}</strong>
+                  <button onClick={() => setQty(q => Math.min(10, q + 1))} style={{ width: 38, height: 38, borderRadius: 4, border: '.5px solid #3D5030', background: '#252C1A', color: '#EFE8D5', fontSize: 18 }}>+</button>
                 </div>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 14, fontWeight: 600, color: '#EFE8D5' }}>Total</span>
-                <span style={{ fontSize: 24, fontFamily: "'Yeseva One',serif", color: '#C8891F' }}>{fmt(total)}</span>
+              <div style={{ textAlign: 'right' }}>
+                <p style={{ color: '#A89B80', fontSize: 13, marginBottom: 6 }}>Subtotal</p>
+                <p style={{ fontSize: 32, fontFamily: "'Yeseva One',serif", color: '#C8891F' }}>{fmt(subtotal)}</p>
               </div>
+              <button onClick={() => setStep(2)} style={{ background: '#C8891F', color: '#0F1208', border: 'none', borderRadius: 2, padding: '16px 34px', fontSize: 12, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase' }}>Continue</button>
             </div>
-          </div>
+          </section>
         )}
 
-        {/* Step 4 — Confirmation */}
-        {step === 4 && (
-          <div style={{ textAlign: 'center', maxWidth: 520, margin: '0 auto' }}>
-            <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#1A3A1A', border: '1.5px solid #6DB86D', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 32px' }}>
-              <svg width="28" height="22" viewBox="0 0 28 22" fill="none" stroke="#6DB86D" strokeWidth="2.5"><path d="M2 11l8 8L26 2"/></svg>
+        {step === 2 && (
+          <section>
+            <h1 style={{ fontSize: 40, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 8 }}>Your details</h1>
+            <p style={{ color: '#A89B80', marginBottom: 32 }}>These details are used for ticket delivery and gate check-in.</p>
+            <div style={{ background: '#1E2418', border: '.5px solid #2A3020', borderRadius: 8, padding: 28, display: 'grid', gap: 18 }}>
+              <div><label style={labelStyle}>Full Name</label><input required value={attendee.name} onChange={e => setAttendee({ ...attendee, name: e.target.value })} style={inputStyle} /></div>
+              <div><label style={labelStyle}>Email Address</label><input required type="email" value={attendee.email} onChange={e => setAttendee({ ...attendee, email: e.target.value })} style={inputStyle} /></div>
+              <div><label style={labelStyle}>Phone Number</label><input required value={attendee.phone} onChange={e => setAttendee({ ...attendee, phone: e.target.value })} style={inputStyle} /></div>
+              <div><label style={labelStyle}>Dietary Requirements</label><input placeholder="Vegetarian, nut allergy, etc." value={attendee.dietary} onChange={e => setAttendee({ ...attendee, dietary: e.target.value })} style={inputStyle} /></div>
             </div>
-            <h2 style={{ fontSize: 40, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 12 }}>You're In!</h2>
-            <p style={{ fontSize: 15, lineHeight: 1.75, color: '#A89B80', marginBottom: 40 }}>
-              Your ticket for <strong style={{ color: '#EFE8D5' }}>{evt.title}</strong> is confirmed. Check your email for details.
-            </p>
-            <div style={{ background: '#1E2418', border: '.5px solid #2A3020', borderRadius: 12, padding: 24, marginBottom: 32, textAlign: 'left' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                {[['Event', evt.title], ['Date', evt.date], ['Ticket', ticketLabel], ['Total Paid', fmt(total)]].map(([k, v]) => (
-                  <div key={k}>
-                    <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '.15em', textTransform: 'uppercase', color: '#A89B80', marginBottom: 4 }}>{k}</p>
-                    <p style={{ fontSize: 13, color: k === 'Total Paid' ? '#C8891F' : '#EFE8D5', fontFamily: k === 'Total Paid' ? "'Yeseva One',serif" : 'inherit' }}>{v}</p>
-                  </div>
-                ))}
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 24 }}>
+              <button onClick={() => setStep(1)} style={{ background: 'transparent', color: '#EFE8D5', border: '1px solid rgba(239,232,213,.4)', borderRadius: 2, padding: '14px 28px', fontSize: 12, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase' }}>Back</button>
+              <button disabled={!canContinue} onClick={() => setStep(3)} style={{ background: canContinue ? '#C8891F' : '#3D5030', color: '#0F1208', border: 'none', borderRadius: 2, padding: '14px 28px', fontSize: 12, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase' }}>Payment</button>
+            </div>
+          </section>
+        )}
+
+        {step === 3 && (
+          <section style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 28 }} className="col1">
+            <div style={{ background: '#1E2418', border: '.5px solid #2A3020', borderRadius: 8, padding: 30 }}>
+              <h1 style={{ fontSize: 36, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 20 }}>Payment</h1>
+              <div style={{ background: '#252C1A', border: `1px dashed ${isPaystackConfigured ? '#6DB86D' : '#C8891F'}`, borderRadius: 8, padding: 26, marginBottom: 22 }}>
+                <p style={{ fontSize: 15, fontWeight: 700, color: '#EFE8D5', marginBottom: 8 }}>Paystack Secure Checkout</p>
+                <p style={{ fontSize: 13, color: '#A89B80', lineHeight: 1.7 }}>
+                  {isPaystackConfigured ? 'Your Paystack inline checkout will open when you click pay.' : 'Demo mode is active. Add VITE_PAYSTACK_PUBLIC_KEY to process real Paystack payments.'}
+                </p>
               </div>
+              {error && <p style={{ color: '#D66B55', fontSize: 13, marginBottom: 16 }}>{error}</p>}
+              <button disabled={loading} onClick={pay} style={{ width: '100%', background: '#C8891F', color: '#0F1208', border: 'none', borderRadius: 2, padding: 18, fontSize: 13, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase' }}>
+                {loading ? 'Processing...' : `Pay ${fmt(total)}`}
+              </button>
             </div>
-            <div style={{ display: 'flex', gap: 16, justifyContent: 'center' }}>
-              <button onClick={() => onNav('ticket')} style={{ background: '#C8891F', color: '#0F1208', border: 'none', borderRadius: 2, padding: '16px 32px', fontSize: 12, fontWeight: 600, letterSpacing: '.10em', textTransform: 'uppercase', cursor: 'pointer' }}>View Your Ticket</button>
-              <button style={{ background: 'transparent', color: '#EFE8D5', border: '1px solid rgba(239,232,213,.4)', borderRadius: 2, padding: '16px 32px', fontSize: 12, fontWeight: 600, letterSpacing: '.10em', textTransform: 'uppercase', cursor: 'pointer' }}>Add to Calendar</button>
+            <div style={{ background: '#1E2418', border: '.5px solid #2A3020', borderRadius: 8, padding: 26, height: 'fit-content' }}>
+              <h2 style={{ fontSize: 22, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 18 }}>Order Summary</h2>
+              {[
+                ['Event', evt.title],
+                ['Ticket', TICKET_TIERS[selected].label],
+                ['Quantity', qty],
+                ['Subtotal', fmt(subtotal)],
+                ['VAT (7.5%)', fmt(vat)],
+                ['Total', fmt(total)],
+              ].map(([key, value]) => (
+                <div key={key} style={{ display: 'flex', justifyContent: 'space-between', gap: 18, borderBottom: '.5px solid #2A3020', padding: '11px 0' }}>
+                  <span style={{ color: '#A89B80', fontSize: 13 }}>{key}</span>
+                  <strong style={{ color: key === 'Total' ? '#C8891F' : '#EFE8D5', fontSize: 13, textAlign: 'right' }}>{value}</strong>
+                </div>
+              ))}
             </div>
-          </div>
+          </section>
+        )}
+
+        {step === 4 && confirmedOrder && (
+          <section style={{ textAlign: 'center', maxWidth: 640, margin: '0 auto' }}>
+            <div style={{ width: 66, height: 66, borderRadius: '50%', background: '#1A3A1A', border: '1.5px solid #6DB86D', display: 'grid', placeItems: 'center', margin: '0 auto 28px', color: '#6DB86D', fontSize: 32 }}>✓</div>
+            <h1 style={{ fontSize: 44, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 12 }}>You're in.</h1>
+            <p style={{ fontSize: 15, color: '#A89B80', lineHeight: 1.8, marginBottom: 30 }}>Your {TICKET_TIERS[selected].label} ticket for {evt.title} has been confirmed. Reference: <strong style={{ color: '#EFE8D5' }}>{confirmedOrder.reference}</strong></p>
+            <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button onClick={() => onNav('ticket', evt.id, selected, qty, confirmedOrder)} style={{ background: '#C8891F', color: '#0F1208', border: 'none', borderRadius: 2, padding: '15px 28px', fontSize: 12, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase' }}>View Ticket</button>
+              <button onClick={() => onNav('accounts', evt.id, selected, qty, confirmedOrder)} style={{ background: 'transparent', color: '#EFE8D5', border: '1px solid rgba(239,232,213,.4)', borderRadius: 2, padding: '15px 28px', fontSize: 12, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase' }}>My Account</button>
+            </div>
+          </section>
         )}
       </div>
     </main>

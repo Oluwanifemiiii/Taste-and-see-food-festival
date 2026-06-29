@@ -1,8 +1,10 @@
-import { EVENTS } from '../data/events'
+import { EVENTS, getTicketLabel } from '../data/events'
 
-export default function Ticket({ eventId, ticketType, onNav }) {
+export default function Ticket({ eventId, ticketType, order, onNav }) {
   const evt = EVENTS.find(e => e.id === eventId) || EVENTS[0]
-  const ticketLabel = { regular: 'Regular', premium: 'Premium', vip: 'VIP Experience' }[ticketType || 'premium']
+  const ticketLabel = getTicketLabel(order?.ticket_type || ticketType || 'premium')
+  const attendeeName = order?.attendee_name || 'Guest Attendee'
+  const reference = order?.reference || 'TSF-DEMO-TICKET'
 
   return (
     <main style={{ minHeight: '100vh', background: '#0F1208', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 20px' }}>
@@ -35,7 +37,7 @@ export default function Ticket({ eventId, ticketType, onNav }) {
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 20, padding: 16, background: '#252C1A', borderRadius: 8, border: '.5px solid #2A3020' }}>
-              {[['Date', evt.date], ['Time', evt.time], ['Location', evt.shortLoc], ['Attendee', 'Adaeze Okonkwo']].map(([k, v]) => (
+              {[['Date', evt.date], ['Time', evt.time], ['Location', evt.shortLoc], ['Attendee', attendeeName]].map(([k, v]) => (
                 <div key={k}>
                   <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '.12em', textTransform: 'uppercase', color: '#A89B80', marginBottom: 4 }}>{k}</p>
                   <p style={{ fontSize: 13, color: '#EFE8D5' }}>{v}</p>
@@ -44,7 +46,7 @@ export default function Ticket({ eventId, ticketType, onNav }) {
             </div>
 
             <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '.12em', textTransform: 'uppercase', color: '#A89B80', marginBottom: 6 }}>Ticket ID</p>
-            <p style={{ fontFamily: 'monospace', fontSize: 13, color: '#C8891F', letterSpacing: '.08em', marginBottom: 24 }}>TSF-2025-YHT-001847</p>
+            <p style={{ fontFamily: 'monospace', fontSize: 13, color: '#C8891F', letterSpacing: '.08em', marginBottom: 24 }}>{reference}</p>
 
             {/* QR code placeholder */}
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
