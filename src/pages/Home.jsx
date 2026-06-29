@@ -53,26 +53,23 @@ export default function Home({ onNav }) {
         </div>
 
         {/* Stat row */}
-        <div className="fu fu6 stat-row" style={{ position: 'absolute', bottom: 48, left: 0, right: 0, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', background: 'rgba(15,18,8,.7)', backdropFilter: 'blur(8px)', borderTop: '.5px solid #2A3020' }}>
           {[
             [counts.events, 'Events per year'],
-            [counts.groups + (counts.groups >= 13 ? '+' : ''), 'Ethnic groups featured'],
-            ['₦' + counts.revenue + 'M', 'Projected Year 1 revenue'],
+            [counts.groups + (counts.groups >= 13 ? '+' : ''), 'Ethnic groups'],
+            ['₦' + counts.revenue + 'M', 'Projected revenue'],
           ].map(([val, label], i) => (
-            <div key={i} style={{ display: 'contents' }}>
-              {i > 0 && <div className="stat-divider" style={{ width: .5, height: 60, background: '#2A3020', flexShrink: 0 }} />}
-              <div className="stat-cell" style={{ textAlign: 'center', padding: '0 clamp(16px, 4vw, 48px)' }}>
-                <div style={{ fontSize: 'clamp(36px, 6vw, 52px)', lineHeight: 1, fontFamily: "'Yeseva One',serif", color: '#C8891F' }}>{val}</div>
-                <div style={{ fontSize: 11, fontWeight: 500, letterSpacing: '.12em', textTransform: 'uppercase', color: '#A89B80', marginTop: 6 }}>{label}</div>
-              </div>
+            <div key={i} style={{ textAlign: 'center', padding: 'clamp(12px,2vh,20px) 8px', borderLeft: i > 0 ? '.5px solid #2A3020' : 'none' }}>
+              <div style={{ fontSize: 'clamp(22px, 4vw, 44px)', lineHeight: 1, fontFamily: "'Yeseva One',serif", color: '#C8891F' }}>{val}</div>
+              <div style={{ fontSize: 'clamp(9px, 2vw, 11px)', fontWeight: 500, letterSpacing: '.08em', textTransform: 'uppercase', color: '#A89B80', marginTop: 4 }}>{label}</div>
             </div>
           ))}
         </div>
       </section>
 
       {/* TWO EXPERIENCES */}
-      <section className="exp-panels" style={{ display: 'flex', minHeight: 600 }}>
-        <div style={{ flex: 1, background: '#1E2418', padding: `clamp(48px, 8vh, 80px) clamp(20px, 5vw, 60px)`, display: 'flex', flexDirection: 'column', justifyContent: 'center', borderRight: '3px solid #C8891F' }}>
+      <section style={{ display: 'flex', flexWrap: 'wrap' }}>
+        <div style={{ flex: 1, minWidth: 'min(300px, 100%)', background: '#1E2418', padding: `clamp(48px, 8vh, 80px) clamp(20px, 5vw, 60px)`, display: 'flex', flexDirection: 'column', justifyContent: 'center', borderBottom: '3px solid #C8891F' }}>
           <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '.18em', textTransform: 'uppercase', color: '#C8891F', marginBottom: 16 }}>Event Type A</p>
           <h2 style={{ fontSize: 'clamp(32px, 5vw, 46px)', lineHeight: 1.1, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 24 }}>Ethnic Food<br />Showcase</h2>
           <p style={{ fontSize: 15, lineHeight: 1.75, color: '#A89B80', maxWidth: 420, marginBottom: 32 }}>A rotating celebration of Nigeria's ethnic culinary heritage. Each event spotlights one group — Yoruba, Igbo, Hausa, Efik, Tiv, Ijaw — with authentic dishes, storytelling, and cultural performance.</p>
@@ -83,8 +80,7 @@ export default function Home({ onNav }) {
           </div>
           <button onClick={() => onNav('events')} style={{ background: 'none', border: 'none', color: '#C8891F', fontSize: 12, fontWeight: 600, letterSpacing: '.10em', textTransform: 'uppercase', cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 8 }}>Explore Events →</button>
         </div>
-        <div className="adire-v" style={{ alignSelf: 'stretch' }} />
-        <div style={{ flex: 1, background: '#252C1A', padding: `clamp(48px, 8vh, 80px) clamp(20px, 5vw, 60px)`, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <div style={{ flex: 1, minWidth: 'min(300px, 100%)', background: '#252C1A', padding: `clamp(48px, 8vh, 80px) clamp(20px, 5vw, 60px)`, display: 'flex', flexDirection: 'column', justifyContent: 'center', borderBottom: '3px solid #A33D21' }}>
           <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '.18em', textTransform: 'uppercase', color: '#A33D21', marginBottom: 16 }}>Event Type B</p>
           <h2 style={{ fontSize: 'clamp(32px, 5vw, 46px)', lineHeight: 1.1, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 24 }}>Old vs New</h2>
           <p style={{ fontSize: 15, lineHeight: 1.75, color: '#A89B80', maxWidth: 420, marginBottom: 32 }}>Traditional methods meet modern innovation. Pepper grinding. Pounded yam. Palm oil processing. Watch a conversation across generations unfold on the same table.</p>
