@@ -1,7 +1,9 @@
 import { useState } from 'react'
-import { EVENTS, TICKET_TIERS, fmt } from '../data/events'
+import { TICKET_TIERS, fmt } from '../data/events'
 import { makeReference, saveOrder } from '../services/orders'
 import { isPaystackConfigured, startPaystackPayment } from '../services/paystack'
+import { sendTicketEmail } from '../services/email'
+import { getEventById, useFestivalEvents } from '../hooks/useFestivalEvents'
 
 const inputStyle = {
   width: '100%',
@@ -25,7 +27,8 @@ const labelStyle = {
 }
 
 export default function Checkout({ eventId, initialTicket, initialQty, onNav }) {
-  const evt = EVENTS.find(e => e.id === eventId) || EVENTS[0]
+  const { events } = useFestivalEvents()
+  const evt = getEventById(events, eventId)
   const [step, setStep] = useState(1)
   const [selected, setSelected] = useState(initialTicket || 'premium')
   const [qty, setQty] = useState(initialQty || 1)
@@ -76,6 +79,8 @@ export default function Checkout({ eventId, initialTicket, initialQty, onNav }) 
         attendee_phone: attendee.phone,
         dietary: attendee.dietary,
       })
+
+      await sendTicketEmail({ order, event: evt, ticketLabel: TICKET_TIERS[selected].label }).catch(() => null)
 
       setConfirmedOrder(order)
       setStep(4)

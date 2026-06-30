@@ -3,7 +3,7 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
 const ADMIN_EMAILS = (import.meta.env.VITE_ADMIN_EMAILS || '').split(',').map(email => email.trim().toLowerCase()).filter(Boolean)
 
 export const isSupabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY)
-const TABLES = new Set(['orders', 'leads', 'event_checkins'])
+const TABLES = new Set(['orders', 'leads', 'event_checkins', 'events'])
 
 function getSession() {
   return JSON.parse(localStorage.getItem('tsf:session') || 'null')
@@ -112,6 +112,50 @@ export async function rpc(name, payload = {}) {
   }
 
   return response.json()
+}
+
+export async function invokeFunction(name, payload = {}) {
+  if (!isSupabaseConfigured) {
+    return { ok: false, skipped: true, message: 'Supabase functions are not configured.' }
+  }
+
+  const response = await fetch(`${SUPABASE_URL}/functions/v1/${name}`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify(payload),
+  })
+
+  if (!response.ok) {
+    throw new Error(`Function ${name} failed: ${await response.text()}`)
+  }
+
+  return response.json()
+}
+
+export async function uploadEventImage(file) {
+  if (!isSupabaseConfigured || !file) return null
+
+  const ext = file.name.split('.').pop() || 'jpg'
+  const filename = `${crypto.randomUUID()}.${ext}`.toLowerCase()
+  const path = `events/${filename}`
+
+  const session = getSession()
+  const response = await fetch(`${SUPABASE_URL}/storage/v1/object/event-images/${path}`, {
+    method: 'POST',
+    headers: {
+      apikey: SUPABASE_ANON_KEY || '',
+      Authorization: `Bearer ${session?.access_token || SUPABASE_ANON_KEY || ''}`,
+      'Content-Type': file.type || 'application/octet-stream',
+      'x-upsert': 'true',
+    },
+    body: file,
+  })
+
+  if (!response.ok) {
+    throw new Error(`Image upload failed: ${await response.text()}`)
+  }
+
+  return `${SUPABASE_URL}/storage/v1/object/public/event-images/${path}`
 }
 
 export async function signUp({ name, email, phone, password }) {

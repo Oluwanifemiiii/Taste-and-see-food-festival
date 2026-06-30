@@ -1,13 +1,15 @@
 import { useState } from 'react'
-import { CITIES, EVENTS } from '../data/events'
+import { CITIES } from '../data/events'
 import EventCard from '../components/EventCard'
+import { useFestivalEvents } from '../hooks/useFestivalEvents'
 
 export default function Events({ onNav }) {
   const [filter, setFilter] = useState('all')
   const [city, setCity] = useState('all')
   const [search, setSearch] = useState('')
+  const { events: allEvents } = useFestivalEvents()
 
-  const filtered = EVENTS.filter(e => {
+  const filtered = allEvents.filter(e => {
     if (filter === 'ethnic' && e.type !== 'A') return false
     if (filter === 'oldnew' && e.type !== 'B') return false
     if (city !== 'all' && e.city !== city) return false
@@ -62,7 +64,7 @@ export default function Events({ onNav }) {
         )}
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 48, paddingTop: 24, borderTop: '.5px solid #2A3020' }}>
-          <span style={{ fontSize: 13, color: '#A89B80' }}>Showing {filtered.length} of {EVENTS.length} events</span>
+          <span style={{ fontSize: 13, color: '#A89B80' }}>Showing {filtered.length} of {allEvents.length} events</span>
           <div style={{ display: 'flex', gap: 8 }}>
             <button style={{ width: 36, height: 36, background: '#1E2418', border: '.5px solid #2A3020', borderRadius: 2, color: '#A89B80', cursor: 'pointer', fontSize: 14 }}>←</button>
             <button style={{ width: 36, height: 36, background: '#C8891F', border: 'none', borderRadius: 2, color: '#0F1208', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>1</button>

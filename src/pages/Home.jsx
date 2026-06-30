@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef } from 'react'
-import { EVENTS, fmt } from '../data/events'
+import { fmt } from '../data/events'
 import Footer from '../components/Footer'
 import EventCard from '../components/EventCard'
+import { useFestivalEvents } from '../hooks/useFestivalEvents'
 
 export default function Home({ onNav }) {
   const [counts, setCounts] = useState({ events: 0, groups: 0, revenue: 0 })
   const [email, setEmail] = useState('')
   const animated = useRef(false)
+  const { events } = useFestivalEvents()
 
   useEffect(() => {
     if (animated.current) return
@@ -107,7 +109,7 @@ export default function Home({ onNav }) {
           <h2 style={{ fontSize: 48, fontFamily: "'Yeseva One',serif", color: '#EFE8D5' }}>Don't Miss What's Coming</h2>
         </div>
         <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
-          {EVENTS.slice(0, 3).map(evt => (
+          {events.slice(0, 3).map(evt => (
             <EventCard key={evt.id} evt={evt} onNavigate={onNav} layout="compact" />
           ))}
         </div>

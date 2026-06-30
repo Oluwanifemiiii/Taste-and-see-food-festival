@@ -1,8 +1,10 @@
 import { useState } from 'react'
-import { EVENTS, fmt, PRICE_MAP, TICKET_TIERS } from '../data/events'
+import { fmt, PRICE_MAP, TICKET_TIERS } from '../data/events'
+import { getEventById, useFestivalEvents } from '../hooks/useFestivalEvents'
 
 export default function EventDetail({ eventId, onNav }) {
-  const evt = EVENTS.find(e => e.id === eventId) || EVENTS[0]
+  const { events } = useFestivalEvents()
+  const evt = getEventById(events, eventId)
   const [selected, setSelected] = useState('premium')
   const [qty, setQty] = useState(1)
 
@@ -16,8 +18,8 @@ export default function EventDetail({ eventId, onNav }) {
 
   return (
     <main style={{ minHeight: '100vh', background: '#0F1208' }}>
-      <div className="photo" style={{ height: 440, position: 'relative', paddingTop: 72 }}>
-        <div className="photo-lbl">Event photography</div>
+      <div className="photo" style={{ height: 440, position: 'relative', paddingTop: 72, ...(evt.image_url ? { backgroundImage: `url(${evt.image_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}) }}>
+        {!evt.image_url && <div className="photo-lbl">Event photography</div>}
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom,rgba(15,18,8,.25) 0%,rgba(15,18,8,.75) 100%)' }} />
         <div style={{ position: 'absolute', bottom: 48, left: 48, right: 48 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
