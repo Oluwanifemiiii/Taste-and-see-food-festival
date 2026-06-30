@@ -38,7 +38,7 @@ export default function Nav({ onNav }) {
       }}>
         <button onClick={() => go('home')} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 3 }}>
           <span style={{ fontSize: 'clamp(18px, 3vw, 24px)', lineHeight: 1, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', letterSpacing: '.02em' }}>TASTE &amp; SEE</span>
-          <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '.22em', textTransform: 'uppercase', color: '#C8891F' }}>FESTIVAL</span>
+          <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '.22em', textTransform: 'uppercase', color: '#C8891F' }}>FOOD FESTIVAL</span>
         </button>
 
         <div className="hm" style={{ display: 'flex', alignItems: 'center', gap: 36 }}>
@@ -73,7 +73,7 @@ export default function Nav({ onNav }) {
       {mobileOpen && (
         <div className="fi" style={{ position: 'fixed', inset: 0, background: '#0F1208', zIndex: 200, display: 'flex', flexDirection: 'column', padding: '40px 24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 60 }}>
-            <span style={{ fontSize: 22, fontFamily: "'Yeseva One',serif", color: '#EFE8D5' }}>TASTE &amp; SEE</span>
+            <span style={{ fontSize: 22, fontFamily: "'Yeseva One',serif", color: '#EFE8D5' }}>TASTE &amp; SEE FOOD FESTIVAL</span>
             <button onClick={() => setMobileOpen(false)} style={{ background: 'none', border: 'none', color: '#EFE8D5', cursor: 'pointer' }}>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
