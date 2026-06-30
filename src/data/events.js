@@ -193,7 +193,7 @@ export const IMPACT_METRICS = [
   ['1,000+', 'Projected vendor and creative jobs'],
 ]
 
-export const PARTNERS = ['Lamide Foods', 'Tourism Lagos', 'Culinary Schools Network', 'Farmers Market NG', 'Hospitality Guild', 'Food Creators Hub']
+export const PARTNERS = ['Lamideflavrfoods', 'Tourism Lagos', 'Culinary Schools Network', 'Farmers Market NG', 'Hospitality Guild', 'Food Creators Hub']
 
 export const MARKETING_CHANNELS = [
   'Instagram',

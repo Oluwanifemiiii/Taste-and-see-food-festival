@@ -4,7 +4,7 @@ const P = 'clamp(16px, 4vw, 48px)'
 const PY = 'clamp(60px, 10vh, 100px)'
 
 const TEAM = [
-  { name: 'Lamide Adeyemi', role: 'Founder & Director', bio: 'Chef, food historian, and the creative force behind Lamide Foods since 2019.' },
+  { name: 'Lamide Adeyemi', role: 'Founder & Director', bio: 'Chef, food historian, and the creative force behind Lamideflavrfoods since 2019.' },
   { name: 'Emeka Okafor', role: 'Programme Director', bio: 'Oversees curation, custodian relationships, and the ethnic group research programme.' },
   { name: 'Chisom Nwosu', role: 'Head of Experience', bio: 'Designs every guest touchpoint from arrival to the final plate. The atmosphere is her craft.' },
   { name: 'Aisha Garba', role: 'Vendor & Partnerships', bio: 'Sources, vets, and supports every artisan and food entrepreneur in the marketplace.' },
@@ -28,17 +28,17 @@ export default function About({ onNav }) {
 
       <div className="adire" style={{ width: '100%', borderRadius: 0 }} />
 
-      {/* About Lamide Foods */}
+      {/* About Lamideflavrfoods */}
       <section style={{ padding: `${PY} ${P}`, maxWidth: 1440, margin: '0 auto', display: 'flex', gap: 80, alignItems: 'flex-start', flexWrap: 'wrap' }}>
         <div style={{ flex: .42, minWidth: 'min(260px, 100%)' }}>
           <div className="photo" style={{ aspectRatio: '3/4', borderRadius: 4, overflow: 'hidden' }}>
-            <div className="photo-lbl">Lamide Foods</div>
+            <div className="photo-lbl">Lamideflavrfoods</div>
           </div>
         </div>
         <div style={{ flex: .58, minWidth: 'min(280px, 100%)' }}>
           <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '.18em', textTransform: 'uppercase', color: '#C8891F', marginBottom: 20 }}>The Organisation</p>
-          <h2 style={{ fontSize: 'clamp(28px, 4vw, 40px)', fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 24, lineHeight: 1.1 }}>About Lamide Foods</h2>
-          <p style={{ fontSize: 15, lineHeight: 1.8, color: '#A89B80', marginBottom: 20 }}>Founded in Lagos in 2019, Lamide Foods began as a catering company with one conviction: that authentic Nigerian cuisine deserved the same care and elevation that fine dining accorded to French, Japanese, or Italian food.</p>
+          <h2 style={{ fontSize: 'clamp(28px, 4vw, 40px)', fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 24, lineHeight: 1.1 }}>About Lamideflavrfoods</h2>
+          <p style={{ fontSize: 15, lineHeight: 1.8, color: '#A89B80', marginBottom: 20 }}>Founded in Lagos in 2019, Lamideflavrfoods began as a catering company with one conviction: that authentic Nigerian cuisine deserved the same care and elevation that fine dining accorded to French, Japanese, or Italian food.</p>
           <p style={{ fontSize: 15, lineHeight: 1.8, color: '#A89B80', marginBottom: 20 }}>What started as private dinners for discerning Lagos clients grew into something larger — a cultural mission to document, celebrate, and preserve the culinary heritage of Nigeria's many peoples before it slips away into convenience and forgetting.</p>
           <p style={{ fontSize: 15, lineHeight: 1.8, color: '#A89B80', marginBottom: 44 }}>The Taste &amp; See Festival was born from a simple question: if we don't celebrate this food, who will?</p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, padding: 'clamp(20px, 4vw, 32px)', background: '#1E2418', border: '.5px solid #2A3020', borderRadius: 12 }}>

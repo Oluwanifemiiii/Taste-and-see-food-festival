@@ -37,7 +37,7 @@ export default function Footer({ onNav }) {
           </div>
         </div>
         <div style={{ borderTop: '.5px solid #2A3020', padding: '20px 0' }}>
-          <p style={{ fontSize: 11, color: '#4A5C3E', letterSpacing: '.05em' }}>© 2026 Lamide Foods. All Rights Reserved.</p>
+          <p style={{ fontSize: 11, color: '#4A5C3E', letterSpacing: '.05em' }}>© 2026 Lamideflavrfoods. All Rights Reserved.</p>
         </div>
       </div>
       <div className="adire" style={{ width: '100%', borderRadius: 0 }} />

@@ -108,7 +108,7 @@ export default function Ticket({ eventId, ticketType, order, onNav }) {
           <div style={{ padding: '16px 32px', background: '#161C10', textAlign: 'center' }}>
           <p style={{ fontSize: 11, color: '#A89B80', letterSpacing: '.08em', marginBottom: 4 }}>Present this ticket at the gate</p>
             <p style={{ fontSize: 10, color: '#4A5C3E', lineHeight: 1.5 }}>Recover later with ticket ID + checkout email</p>
-            <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '.15em', textTransform: 'uppercase', color: '#4A5C3E' }}>Lamide Foods</p>
+            <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '.15em', textTransform: 'uppercase', color: '#4A5C3E' }}>Lamideflavrfoods</p>
           </div>
         </div>
 

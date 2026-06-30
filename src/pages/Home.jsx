@@ -180,7 +180,7 @@ export default function Home({ onNav }) {
               <div style={{ fontSize: 52, lineHeight: 1, fontFamily: "'Yeseva One',serif", color: '#A33D21', marginBottom: 8 }}>₦50,000</div>
               <div className="adire" style={{ width: 60, margin: '20px 0' }} />
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 40, flex: 1 }}>
-                {['All Premium benefits', 'Private chef access', 'Exclusive masterclass', 'VIP lounge access', 'Gift bag from Lamide Foods'].map(f => (
+                {['All Premium benefits', 'Private chef access', 'Exclusive masterclass', 'VIP lounge access', 'Gift bag from Lamideflavrfoods'].map(f => (
                   <div key={f} style={{ display: 'flex', gap: 10 }}><span style={{ color: '#A33D21', marginTop: 1 }}>✓</span><span style={{ fontSize: 14, lineHeight: 1.6, color: '#A89B80' }}>{f}</span></div>
                 ))}
               </div>
