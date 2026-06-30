@@ -71,11 +71,54 @@ export async function listRows(table) {
   return response.json()
 }
 
+export async function findRows(table, filters = {}) {
+  assertTable(table)
+  if (!isSupabaseConfigured) {
+    const rows = JSON.parse(localStorage.getItem(`tsf:${table}`) || '[]')
+    return rows.filter(row => Object.entries(filters).every(([key, value]) => {
+      if (!value) return true
+      return String(row[key] || '').toLowerCase() === String(value).toLowerCase()
+    }))
+  }
+
+  const params = new URLSearchParams({ select: '*' })
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value) params.set(key, `eq.${value}`)
+  })
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${params.toString()}`, {
+    headers: authHeaders(),
+  })
+
+  if (!response.ok) {
+    throw new Error(`Could not search ${table}: ${await response.text()}`)
+  }
+
+  return response.json()
+}
+
+export async function rpc(name, payload = {}) {
+  if (!isSupabaseConfigured) {
+    throw new Error('RPC calls require Supabase configuration.')
+  }
+
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify(payload),
+  })
+
+  if (!response.ok) {
+    throw new Error(`RPC ${name} failed: ${await response.text()}`)
+  }
+
+  return response.json()
+}
+
 export async function signUp({ name, email, phone, password }) {
   if (!isSupabaseConfigured) {
     const user = { name, email, phone, role: isAdminEmail(email) ? 'admin' : 'guest' }
     localStorage.setItem('tsf:user', JSON.stringify(user))
-    return { user }
+    return { user, needsConfirmation: false }
   }
 
   const response = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
@@ -93,10 +136,13 @@ export async function signUp({ name, email, phone, password }) {
   }
 
   const session = await response.json()
-  if (session.access_token) localStorage.setItem('tsf:session', JSON.stringify(session))
   const user = normalizeUser(session.user, { name, email, phone })
+  if (!session.access_token) {
+    return { user, session, needsConfirmation: true }
+  }
+  localStorage.setItem('tsf:session', JSON.stringify(session))
   localStorage.setItem('tsf:user', JSON.stringify(user))
-  return { user, session }
+  return { user, session, needsConfirmation: false }
 }
 
 export async function signIn({ email, password }) {
@@ -114,7 +160,9 @@ export async function signIn({ email, password }) {
   })
 
   if (!response.ok) {
-    throw new Error('Invalid email or password.')
+    const body = await response.json().catch(() => ({}))
+    const message = body.error_description || body.msg || body.error || 'Invalid email or password.'
+    throw new Error(message.includes('Email not confirmed') ? 'Please confirm your email address first, then sign in.' : message)
   }
 
   const session = await response.json()

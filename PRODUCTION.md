@@ -28,6 +28,8 @@ Set these as Supabase Edge Function secrets:
 - Use live Paystack keys only after webhook verification is deployed.
 - Replace placeholder imagery with licensed Nigerian food, festival, chef, and marketplace photography.
 - Test guest checkout, account signup, admin login, sponsor lead submission, vendor lead submission, and mobile views.
+- Decide whether Supabase Auth should require email confirmation. If enabled, users must confirm their email before sign-in.
+- Test guest ticket recovery at `/lookup` with ticket reference and checkout email.
 - Add email delivery for tickets and receipts through a transactional email provider.
 - Add monitoring for failed Paystack callbacks and failed Supabase writes.
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { EVENTS, fmt } from '../data/events'
 import { currentUser, isAdminUser, isSupabaseConfigured, listRows } from '../services/supabase'
+import { findTicket, recordCheckIn } from '../services/orders'
 
 const box = {
   background: '#1E2418',
@@ -12,6 +13,9 @@ const box = {
 export default function Admin({ onNav }) {
   const [orders, setOrders] = useState([])
   const [leads, setLeads] = useState([])
+  const [verify, setVerify] = useState({ reference: '', email: '' })
+  const [verifiedTicket, setVerifiedTicket] = useState(null)
+  const [verifyMessage, setVerifyMessage] = useState('')
   const user = currentUser()
   const allowed = isAdminUser(user)
 
@@ -24,6 +28,32 @@ export default function Admin({ onNav }) {
   const revenue = orders.reduce((sum, order) => sum + Number(order.total || 0), 0)
   const sold = EVENTS.reduce((sum, event) => sum + event.sold, 0) + orders.reduce((sum, order) => sum + Number(order.quantity || 0), 0)
   const capacity = EVENTS.reduce((sum, event) => sum + event.capacity, 0)
+
+  const verifyTicket = async (e) => {
+    e.preventDefault()
+    setVerifyMessage('')
+    setVerifiedTicket(null)
+    try {
+      const ticket = await findTicket(verify)
+      if (!ticket) {
+        setVerifyMessage('No matching ticket found.')
+      } else {
+        setVerifiedTicket(ticket)
+      }
+    } catch (err) {
+      setVerifyMessage(err.message || 'Could not verify ticket.')
+    }
+  }
+
+  const checkInTicket = async () => {
+    if (!verifiedTicket) return
+    try {
+      await recordCheckIn({ reference: verifiedTicket.reference, checkedInBy: user?.email })
+      setVerifyMessage('Ticket checked in successfully.')
+    } catch (err) {
+      setVerifyMessage(err.message || 'Could not check in ticket.')
+    }
+  }
 
   return (
     <main style={{ minHeight: '100vh', background: '#0F1208', padding: '120px 48px 80px' }}>
@@ -91,6 +121,22 @@ export default function Admin({ onNav }) {
           </section>
 
           <section style={box}>
+            <h2 style={{ fontSize: 26, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 20 }}>Gate Verification</h2>
+            <form onSubmit={verifyTicket} style={{ display: 'grid', gap: 12, marginBottom: 20 }}>
+              <input required placeholder="Ticket reference" value={verify.reference} onChange={e => setVerify({ ...verify, reference: e.target.value.trim().toUpperCase() })} style={{ background: '#252C1A', border: '.5px solid #3D5030', borderRadius: 4, padding: '12px 14px', color: '#EFE8D5' }} />
+              <input required type="email" placeholder="Attendee email" value={verify.email} onChange={e => setVerify({ ...verify, email: e.target.value.trim() })} style={{ background: '#252C1A', border: '.5px solid #3D5030', borderRadius: 4, padding: '12px 14px', color: '#EFE8D5' }} />
+              <button style={{ background: '#C8891F', color: '#0F1208', border: 'none', borderRadius: 2, padding: 13, fontSize: 12, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase' }}>Verify</button>
+            </form>
+            {verifiedTicket && (
+              <div style={{ background: '#252C1A', border: '.5px solid #3D5030', borderRadius: 8, padding: 16, marginBottom: 18 }}>
+                <p style={{ fontSize: 10, letterSpacing: '.14em', textTransform: 'uppercase', color: '#C8891F', marginBottom: 6 }}>{verifiedTicket.reference}</p>
+                <p style={{ color: '#EFE8D5', fontWeight: 700, marginBottom: 4 }}>{verifiedTicket.event_title}</p>
+                <p style={{ color: '#A89B80', fontSize: 13, marginBottom: 12 }}>{verifiedTicket.attendee_name} • {verifiedTicket.ticket_type} • Qty {verifiedTicket.quantity}</p>
+                <button onClick={checkInTicket} style={{ width: '100%', background: '#6DB86D', color: '#0F1208', border: 'none', borderRadius: 2, padding: 12, fontSize: 12, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase' }}>Check In</button>
+              </div>
+            )}
+            {verifyMessage && <p style={{ color: verifyMessage.includes('success') ? '#6DB86D' : '#D66B55', fontSize: 13, lineHeight: 1.6, marginBottom: 24 }}>{verifyMessage}</p>}
+
             <h2 style={{ fontSize: 26, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 20 }}>Recent Activity</h2>
             <div style={{ display: 'grid', gap: 14 }}>
               {[...orders.map(order => ({ type: 'Order', title: order.event_title, meta: `${order.ticket_type} • ${fmt(order.total || 0)}` })), ...leads.map(lead => ({ type: lead.type, title: lead.name, meta: lead.interest }))].slice(0, 10).map((item, index) => (

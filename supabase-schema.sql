@@ -62,15 +62,68 @@ on orders for insert
 to anon
 with check (true);
 
+create policy "signed in users can create orders"
+on orders for insert
+to authenticated
+with check (true);
+
+create policy "users can read their own orders"
+on orders for select
+to authenticated
+using (lower(attendee_email) = lower(auth.jwt() ->> 'email'));
+
+create or replace function public.lookup_ticket(ticket_reference text, ticket_email text)
+returns table (
+  reference text,
+  payment_status text,
+  event_id integer,
+  event_title text,
+  ticket_type text,
+  quantity integer,
+  total integer,
+  attendee_name text,
+  attendee_email text,
+  attendee_phone text,
+  dietary text
+)
+language sql
+security definer
+set search_path = public
+as $$
+  select
+    orders.reference,
+    orders.payment_status,
+    orders.event_id,
+    orders.event_title,
+    orders.ticket_type,
+    orders.quantity,
+    orders.total,
+    orders.attendee_name,
+    orders.attendee_email,
+    orders.attendee_phone,
+    orders.dietary
+  from orders
+  where lower(orders.reference) = lower(ticket_reference)
+    and lower(orders.attendee_email) = lower(ticket_email)
+  limit 1;
+$$;
+
 create policy "public can create leads"
 on leads for insert
 to anon
+with check (true);
+
+create policy "signed in users can create leads"
+on leads for insert
+to authenticated
 with check (true);
 
 create policy "admins can read admin list"
 on admin_users for select
 to authenticated
 using (lower(email) = lower(auth.jwt() ->> 'email'));
+
+grant execute on function public.lookup_ticket(text, text) to anon, authenticated;
 
 create policy "admins can read orders"
 on orders for select

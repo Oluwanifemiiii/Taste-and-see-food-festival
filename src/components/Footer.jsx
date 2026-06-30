@@ -14,6 +14,7 @@ export default function Footer({ onNav }) {
               ['business', 'Vendor Booths'],
               ['business', 'Sponsors'],
               ['business', 'Merchandise'],
+              ['lookup', 'Find Ticket'],
               ['legal', 'Terms & Privacy'],
             ].map(([page, label], i) => (
               <button key={i} onClick={() => onNav(page)} className="nav-lnk"
