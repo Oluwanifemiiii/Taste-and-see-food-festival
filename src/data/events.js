@@ -14,7 +14,7 @@ export const TICKET_TIERS = {
   vip: {
     label: 'VIP Experience',
     price: 50000,
-    benefits: ['All Premium benefits', 'Chef access', 'VIP lounge', 'Gift bag from Lamide Foods'],
+    benefits: ['All Premium benefits', 'Chef access', 'VIP lounge', 'Gift bag from Lamideflavrfoods'],
   },
 }
 

@@ -1,8 +1,16 @@
 import { useState, useEffect } from 'react'
+import { currentUser } from '../services/supabase'
 
 export default function Nav({ onNav }) {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [user, setUser] = useState(currentUser)
+
+  useEffect(() => {
+    const sync = () => setUser(currentUser())
+    window.addEventListener('focus', sync)
+    return () => window.removeEventListener('focus', sync)
+  }, [])
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 80)
@@ -41,12 +49,12 @@ export default function Nav({ onNav }) {
         </div>
 
         <div className="hm" style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-          <a href="#" className="nav-lnk" style={{ color: '#A89B80', transition: 'color .2s' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
-          </a>
-          <a href="#" className="nav-lnk" style={{ color: '#A89B80', transition: 'color .2s' }}>
-            <svg width="15" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.93a8.18 8.18 0 0 0 4.78 1.52V7.01a4.85 4.85 0 0 1-1.01-.32z"/></svg>
-          </a>
+          {/* Profile icon — shows dot when logged in */}
+          <button onClick={() => go('accounts')} title={user ? `Signed in as ${user.name}` : 'Sign in'}
+            style={{ position: 'relative', background: 'none', border: 'none', color: '#A89B80', cursor: 'pointer', padding: 2, display: 'flex', alignItems: 'center' }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            {user && <span style={{ position: 'absolute', top: 0, right: 0, width: 7, height: 7, background: '#6DB86D', borderRadius: '50%', border: '1.5px solid #0F1208' }} />}
+          </button>
           <button onClick={() => go('checkout')}
             style={{ background: '#C8891F', color: '#0F1208', border: 'none', borderRadius: 2, padding: '10px 20px', fontSize: 12, fontWeight: 600, letterSpacing: '.10em', textTransform: 'uppercase', cursor: 'pointer', transition: 'background .2s' }}
             onMouseOver={e => e.currentTarget.style.background = '#B07A18'}
@@ -69,12 +77,17 @@ export default function Nav({ onNav }) {
             </button>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-            {[['events', 'Events'], ['experience', 'Experience'], ['business', 'Business'], ['about', 'About'], ['auth', 'Tickets']].map(([page, label]) => (
+            {[['events', 'Events'], ['experience', 'Experience'], ['business', 'Business'], ['about', 'About']].map(([page, label]) => (
               <button key={page} onClick={() => go(page)}
                 style={{ background: 'none', border: 'none', fontSize: 'clamp(28px, 8vw, 36px)', fontFamily: "'Yeseva One',serif", color: '#EFE8D5', cursor: 'pointer', textAlign: 'left' }}>
                 {label}
               </button>
             ))}
+            <button onClick={() => go('accounts')}
+              style={{ background: 'none', border: 'none', fontSize: 'clamp(28px, 8vw, 36px)', fontFamily: "'Yeseva One',serif", color: user ? '#6DB86D' : '#A89B80', cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 12 }}>
+              {user ? `Hi, ${user.name?.split(' ')[0]}` : 'Sign In'}
+              {user && <span style={{ width: 10, height: 10, background: '#6DB86D', borderRadius: '50%', display: 'inline-block', flexShrink: 0 }} />}
+            </button>
           </div>
           <div style={{ marginTop: 'auto' }}>
             <button onClick={() => go('checkout')} style={{ width: '100%', background: '#C8891F', color: '#0F1208', border: 'none', borderRadius: 2, padding: 18, fontSize: 12, fontWeight: 600, letterSpacing: '.10em', textTransform: 'uppercase', cursor: 'pointer' }}>
