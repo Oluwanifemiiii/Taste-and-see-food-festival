@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { EVENTS, getTicketLabel, fmt } from '../data/events'
 import { currentUser, findRows, signOut } from '../services/supabase'
+import { getEventById, useFestivalEvents } from '../hooks/useFestivalEvents'
 
 export default function Account({ onNav, order }) {
   const [remoteOrders, setRemoteOrders] = useState([])
+  const { events } = useFestivalEvents()
   const user = currentUser()
   const savedOrders = JSON.parse(localStorage.getItem('tsf:orders') || '[]')
   const merged = order ? [order, ...remoteOrders, ...savedOrders] : [...remoteOrders, ...savedOrders]
@@ -33,7 +35,7 @@ export default function Account({ onNav, order }) {
 
         <div style={{ display: 'grid', gap: 18 }}>
           {orders.map(item => {
-            const event = EVENTS.find(evt => evt.id === Number(item.event_id)) || EVENTS[0]
+            const event = getEventById(events, Number(item.event_id)) || EVENTS[0]
             return (
               <div key={item.reference} style={{ background: '#1E2418', border: '.5px solid #2A3020', borderRadius: 8, padding: 24, display: 'flex', justifyContent: 'space-between', gap: 20, flexWrap: 'wrap' }}>
                 <div>

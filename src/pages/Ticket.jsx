@@ -1,7 +1,9 @@
 import { EVENTS, getTicketLabel } from '../data/events'
+import { getEventById, useFestivalEvents } from '../hooks/useFestivalEvents'
 
 export default function Ticket({ eventId, ticketType, order, onNav }) {
-  const evt = EVENTS.find(e => e.id === eventId) || EVENTS[0]
+  const { events } = useFestivalEvents()
+  const evt = getEventById(events, eventId) || EVENTS[0]
   const ticketLabel = getTicketLabel(order?.ticket_type || ticketType || 'premium')
   const attendeeName = order?.attendee_name || 'Guest Attendee'
   const reference = order?.reference

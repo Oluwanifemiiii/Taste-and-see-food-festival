@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { EVENTS, getTicketLabel, fmt } from '../data/events'
 import { findTicket } from '../services/orders'
+import { getEventById, useFestivalEvents } from '../hooks/useFestivalEvents'
 
 const inputStyle = {
   width: '100%',
@@ -17,6 +18,7 @@ export default function TicketLookup({ onNav }) {
   const [ticket, setTicket] = useState(null)
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
+  const { events } = useFestivalEvents()
 
   const submit = async (e) => {
     e.preventDefault()
@@ -37,7 +39,7 @@ export default function TicketLookup({ onNav }) {
     }
   }
 
-  const event = ticket ? EVENTS.find(evt => evt.id === Number(ticket.event_id)) || EVENTS[0] : null
+  const event = ticket ? getEventById(events, Number(ticket.event_id)) || EVENTS[0] : null
 
   return (
     <main style={{ minHeight: '100vh', background: '#0F1208', padding: '120px 48px 80px' }}>
