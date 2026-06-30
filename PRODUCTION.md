@@ -35,6 +35,7 @@ Set these as Supabase Edge Function secrets:
 - Test guest checkout, account signup, admin login, sponsor lead submission, vendor lead submission, and mobile views.
 - Test admin event creation and image upload from `/admin`.
 - Decide whether Supabase Auth should require email confirmation. If enabled, users must confirm their email before sign-in.
+- If Supabase SMTP is not configured yet, disable email confirmation in Supabase Auth settings for testing, or use the app's fallback account mode. The fallback keeps the UI usable, but full authenticated Supabase reads require a confirmed/login session.
 - Test guest ticket recovery at `/lookup` with ticket reference and checkout email.
 - Confirm ticket email delivery through Resend after successful checkout.
 - Add monitoring for failed Paystack callbacks and failed Supabase writes.

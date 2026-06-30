@@ -35,7 +35,7 @@ export default function Admin({ onNav }) {
     capacity: 500,
     status: 'Open',
     image_url: '',
-    desc: '',
+    description: '',
     dishes: '',
     methods: '',
   })
@@ -73,7 +73,7 @@ export default function Admin({ onNav }) {
         methods: eventForm.methods.split(',').map(item => item.trim()).filter(Boolean),
       })
       setManagedEvents([row, ...managedEvents])
-      setEventForm({ type: 'A', title: '', ethnic: '', date: '', time: '', city: 'Lagos', location: '', short_loc: '', capacity: 500, status: 'Open', image_url: '', desc: '', dishes: '', methods: '' })
+      setEventForm({ type: 'A', title: '', ethnic: '', date: '', time: '', city: 'Lagos', location: '', short_loc: '', capacity: 500, status: 'Open', image_url: '', description: '', dishes: '', methods: '' })
       setEventImage(null)
       setEventMessage('Event created. It now appears on the public events page.')
     } catch (err) {
@@ -224,7 +224,7 @@ export default function Admin({ onNav }) {
               <input placeholder="Short location" value={eventForm.short_loc} onChange={e => setEventForm({ ...eventForm, short_loc: e.target.value })} style={fieldStyle} />
               <input type="number" min="1" placeholder="Capacity" value={eventForm.capacity} onChange={e => setEventForm({ ...eventForm, capacity: e.target.value })} style={fieldStyle} />
             </div>
-            <textarea required placeholder="Event description" value={eventForm.desc} onChange={e => setEventForm({ ...eventForm, desc: e.target.value })} style={{ ...fieldStyle, minHeight: 90 }} />
+            <textarea required placeholder="Event description" value={eventForm.description} onChange={e => setEventForm({ ...eventForm, description: e.target.value })} style={{ ...fieldStyle, minHeight: 90 }} />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }} className="col1">
               <input placeholder="Dishes, comma separated" value={eventForm.dishes} onChange={e => setEventForm({ ...eventForm, dishes: e.target.value })} style={fieldStyle} />
               <input placeholder="Methods, comma separated" value={eventForm.methods} onChange={e => setEventForm({ ...eventForm, methods: e.target.value })} style={fieldStyle} />

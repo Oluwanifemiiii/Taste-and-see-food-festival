@@ -34,6 +34,7 @@ export default function Checkout({ eventId, initialTicket, initialQty, onNav }) 
   const [qty, setQty] = useState(initialQty || 1)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [emailNotice, setEmailNotice] = useState('')
   const [confirmedOrder, setConfirmedOrder] = useState(null)
   const [attendee, setAttendee] = useState({
     name: '',
@@ -80,7 +81,12 @@ export default function Checkout({ eventId, initialTicket, initialQty, onNav }) 
         dietary: attendee.dietary,
       })
 
-      await sendTicketEmail({ order, event: evt, ticketLabel: TICKET_TIERS[selected].label }).catch(() => null)
+      const emailResult = await sendTicketEmail({ order, event: evt, ticketLabel: TICKET_TIERS[selected].label }).catch(() => ({ skipped: true }))
+      if (emailResult?.skipped) {
+        setEmailNotice('Email delivery is not configured yet, so please save your ticket reference. You can recover the ticket later with your reference and email.')
+      } else {
+        setEmailNotice('A confirmation email has been sent with your ticket details.')
+      }
 
       setConfirmedOrder(order)
       setStep(4)
@@ -193,6 +199,7 @@ export default function Checkout({ eventId, initialTicket, initialQty, onNav }) 
             <div style={{ width: 66, height: 66, borderRadius: '50%', background: '#1A3A1A', border: '1.5px solid #6DB86D', display: 'grid', placeItems: 'center', margin: '0 auto 28px', color: '#6DB86D', fontSize: 32 }}>✓</div>
             <h1 style={{ fontSize: 44, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 12 }}>You're in.</h1>
             <p style={{ fontSize: 15, color: '#A89B80', lineHeight: 1.8, marginBottom: 30 }}>Your {TICKET_TIERS[selected].label} ticket for {evt.title} has been confirmed. Reference: <strong style={{ color: '#EFE8D5' }}>{confirmedOrder.reference}</strong></p>
+            {emailNotice && <p style={{ fontSize: 13, color: emailNotice.includes('not configured') ? '#C8891F' : '#6DB86D', lineHeight: 1.7, marginBottom: 24 }}>{emailNotice}</p>}
             <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
               <button onClick={() => onNav('ticket', evt.id, selected, qty, confirmedOrder)} style={{ background: '#C8891F', color: '#0F1208', border: 'none', borderRadius: 2, padding: '15px 28px', fontSize: 12, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase' }}>View Ticket</button>
               <button onClick={() => onNav('accounts', evt.id, selected, qty, confirmedOrder)} style={{ background: 'transparent', color: '#EFE8D5', border: '1px solid rgba(239,232,213,.4)', borderRadius: 2, padding: '15px 28px', fontSize: 12, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase' }}>My Account</button>

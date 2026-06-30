@@ -32,7 +32,7 @@ create table if not exists events (
   status text not null default 'Open',
   capacity integer not null default 0,
   sold integer not null default 0,
-  desc text not null,
+  description text not null,
   dishes jsonb not null default '[]'::jsonb,
   methods jsonb not null default '[]'::jsonb,
   image_url text
