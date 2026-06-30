@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { EVENTS, getTicketLabel, fmt } from '../data/events'
-import { currentUser, signOut, isSupabaseConfigured } from '../services/supabase'
+import { currentUser, findRows, signOut, isSupabaseConfigured } from '../services/supabase'
+import { getEventById, useFestivalEvents } from '../hooks/useFestivalEvents'
 
 const inputStyle = {
   width: '100%',
@@ -25,13 +26,26 @@ const labelStyle = {
 }
 
 export default function Account({ onNav, order }) {
-  const [user, setUser] = useState(currentUser)
+  const [user, setUser] = useState(currentUser())
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState({ name: user?.name || '', email: user?.email || '', phone: user?.phone || '' })
   const [saved, setSaved] = useState(false)
+  const [remoteOrders, setRemoteOrders] = useState([])
+  const { events } = useFestivalEvents()
 
   const savedOrders = JSON.parse(localStorage.getItem('tsf:orders') || '[]')
-  const orders = order ? [order, ...savedOrders.filter(item => item.reference !== order.reference)] : savedOrders
+  const merged = order ? [order, ...remoteOrders, ...savedOrders] : [...remoteOrders, ...savedOrders]
+  const orders = Array.from(new Map(merged.map(item => [item.reference, item])).values())
+
+  const logout = () => {
+    signOut()
+    onNav('auth')
+  }
+
+  useEffect(() => {
+    if (!user?.email) return
+    findRows('orders', { attendee_email: user.email }).then(setRemoteOrders).catch(() => setRemoteOrders([]))
+  }, [user?.email])
 
   const handleLogout = () => {
     signOut()
@@ -141,7 +155,7 @@ export default function Account({ onNav, order }) {
 
         <div style={{ display: 'grid', gap: 18 }}>
           {orders.map(item => {
-            const event = EVENTS.find(evt => evt.id === Number(item.event_id)) || EVENTS[0]
+            const event = getEventById(events, Number(item.event_id)) || EVENTS[0]
             return (
               <div key={item.reference} style={{ background: '#1E2418', border: '.5px solid #2A3020', borderRadius: 8, padding: 24, display: 'flex', justifyContent: 'space-between', gap: 20, flexWrap: 'wrap' }}>
                 <div>
@@ -160,7 +174,10 @@ export default function Account({ onNav, order }) {
             <div style={{ background: '#1E2418', border: '.5px solid #2A3020', borderRadius: 8, padding: 36, textAlign: 'center' }}>
               <h3 style={{ fontSize: 24, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 12 }}>No tickets yet</h3>
               <p style={{ color: '#A89B80', marginBottom: 24 }}>Book an event and your ticket will appear here.</p>
-              <button onClick={() => onNav('events')} style={{ background: '#C8891F', color: '#0F1208', border: 'none', borderRadius: 2, padding: '14px 24px', fontSize: 12, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase', cursor: 'pointer' }}>Browse Events</button>
+              <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+                <button onClick={() => onNav('events')} style={{ background: '#C8891F', color: '#0F1208', border: 'none', borderRadius: 2, padding: '14px 24px', fontSize: 12, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase', cursor: 'pointer' }}>Browse Events</button>
+                <button onClick={() => onNav('lookup')} style={{ background: 'transparent', color: '#EFE8D5', border: '1px solid rgba(239,232,213,.4)', borderRadius: 2, padding: '14px 24px', fontSize: 12, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase', cursor: 'pointer' }}>Find Ticket</button>
+              </div>
             </div>
           )}
         </div>

@@ -2,13 +2,14 @@ import { fmt, TICKET_TIERS } from '../data/events'
 
 export default function EventCard({ evt, onNavigate, layout = 'grid' }) {
   const badgeBg = evt.type === 'A' ? '#C8891F' : '#A33D21'
+  const imageStyle = evt.image_url ? { backgroundImage: `linear-gradient(to bottom,transparent 45%,rgba(15,18,8,.7) 100%),url(${evt.image_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}
 
   if (layout === 'compact') {
     return (
       <div className="hov-card" onClick={() => onNavigate('event-detail', evt.id)}
         style={{ flex: 1, minWidth: 280, background: '#1E2418', border: '.5px solid #2A3020', borderRadius: 12, overflow: 'hidden', display: 'flex', flexDirection: 'column', cursor: 'pointer' }}>
-        <div className="photo" style={{ aspectRatio: '16/9', position: 'relative' }}>
-          <div className="photo-lbl">Event photography</div>
+        <div className="photo" style={{ aspectRatio: '16/9', position: 'relative', ...imageStyle }}>
+          {!evt.image_url && <div className="photo-lbl">Event photography</div>}
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom,transparent 50%,rgba(15,18,8,.65) 100%)' }} />
           <div style={{ position: 'absolute', top: 12, left: 12, background: badgeBg, color: '#0F1208', padding: '4px 10px', borderRadius: 2, fontSize: 10, fontWeight: 600, letterSpacing: '.10em', textTransform: 'uppercase', zIndex: 1 }}>
             {evt.type === 'A' ? 'Ethnic Showcase' : 'Old vs New'}
@@ -44,8 +45,8 @@ export default function EventCard({ evt, onNavigate, layout = 'grid' }) {
   return (
     <div className="hov-card" onClick={() => onNavigate('event-detail', evt.id)}
       style={{ background: '#1E2418', border: '.5px solid #2A3020', borderRadius: 12, overflow: 'hidden', cursor: 'pointer' }}>
-      <div className="photo" style={{ aspectRatio: '16/9', position: 'relative' }}>
-        <div className="photo-lbl">Event photography</div>
+      <div className="photo" style={{ aspectRatio: '16/9', position: 'relative', ...imageStyle }}>
+        {!evt.image_url && <div className="photo-lbl">Event photography</div>}
         <div style={{ position: 'absolute', top: 12, left: 12, background: badgeBg, color: '#0F1208', padding: '4px 10px', borderRadius: 2, fontSize: 10, fontWeight: 600, letterSpacing: '.10em', textTransform: 'uppercase', zIndex: 1 }}>
           {evt.type === 'A' ? 'Ethnic Showcase' : 'Old vs New'}
         </div>

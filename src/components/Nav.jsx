@@ -4,13 +4,15 @@ import { currentUser } from '../services/supabase'
 export default function Nav({ onNav }) {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [user, setUser] = useState(currentUser)
+  const [user, setUser] = useState(currentUser())
 
   useEffect(() => {
     const sync = () => setUser(currentUser())
     window.addEventListener('focus', sync)
     return () => window.removeEventListener('focus', sync)
   }, [])
+
+  const accountTarget = user ? 'accounts' : 'auth'
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 80)
@@ -40,7 +42,7 @@ export default function Nav({ onNav }) {
         </button>
 
         <div className="hm" style={{ display: 'flex', alignItems: 'center', gap: 36 }}>
-          {[['events', 'Events'], ['experience', 'Experience'], ['business', 'Business'], ['about', 'About'], ['auth', 'Tickets']].map(([page, label]) => (
+          {[['events', 'Events'], ['experience', 'Experience'], ['business', 'Business'], ['checkout', 'Tickets'], ['lookup', 'Find Ticket'], [accountTarget, 'Account']].map(([page, label]) => (
             <button key={page} onClick={() => go(page)} className="nav-lnk"
               style={{ background: 'none', border: 'none', fontSize: 13, fontWeight: 500, color: '#A89B80', cursor: 'pointer', transition: 'color .2s' }}>
               {label}
@@ -77,7 +79,7 @@ export default function Nav({ onNav }) {
             </button>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-            {[['events', 'Events'], ['experience', 'Experience'], ['business', 'Business'], ['about', 'About']].map(([page, label]) => (
+            {[['events', 'Events'], ['experience', 'Experience'], ['business', 'Business'], ['checkout', 'Tickets'], ['lookup', 'Find Ticket']].map(([page, label]) => (
               <button key={page} onClick={() => go(page)}
                 style={{ background: 'none', border: 'none', fontSize: 'clamp(28px, 8vw, 36px)', fontFamily: "'Yeseva One',serif", color: '#EFE8D5', cursor: 'pointer', textAlign: 'left' }}>
                 {label}

@@ -12,12 +12,14 @@ import Business from './pages/Business'
 import Admin from './pages/Admin'
 import Account from './pages/Account'
 import Legal from './pages/Legal'
+import TicketLookup from './pages/TicketLookup'
 
 function routeFromPath(pathname) {
   const parts = pathname.split('/').filter(Boolean)
   if (!parts.length) return { page: 'home' }
   if (parts[0] === 'events' && parts[1]) return { page: 'event-detail', eventId: Number(parts[1]) || 1 }
   if (parts[0] === 'checkout') return { page: 'checkout', eventId: Number(parts[1]) || 1 }
+  if (parts[0] === 'tickets') return { page: 'checkout', eventId: Number(parts[1]) || 1 }
   if (parts[0] === 'ticket') return { page: 'ticket', eventId: Number(parts[1]) || 1 }
   const routes = {
     events: 'events',
@@ -27,6 +29,7 @@ function routeFromPath(pathname) {
     auth: 'auth',
     account: 'accounts',
     accounts: 'accounts',
+    lookup: 'lookup',
     admin: 'admin',
     legal: 'legal',
   }
@@ -45,6 +48,7 @@ function pathForRoute(page, eventId) {
     business: '/business',
     auth: '/auth',
     accounts: '/account',
+    lookup: '/lookup',
     admin: '/admin',
     legal: '/legal',
   }
@@ -106,6 +110,7 @@ export default function App() {
       {page === 'business' && <Business onNav={navigate} />}
       {page === 'admin' && <Admin onNav={navigate} />}
       {page === 'accounts' && <Account onNav={navigate} order={latestOrder} />}
+      {page === 'lookup' && <TicketLookup onNav={navigate} />}
       {page === 'legal' && <Legal onNav={navigate} />}
     </>
   )

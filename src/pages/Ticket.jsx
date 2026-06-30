@@ -1,10 +1,29 @@
 import { EVENTS, getTicketLabel } from '../data/events'
+import { getEventById, useFestivalEvents } from '../hooks/useFestivalEvents'
 
 export default function Ticket({ eventId, ticketType, order, onNav }) {
-  const evt = EVENTS.find(e => e.id === eventId) || EVENTS[0]
+  const { events } = useFestivalEvents()
+  const evt = getEventById(events, eventId) || EVENTS[0]
   const ticketLabel = getTicketLabel(order?.ticket_type || ticketType || 'premium')
   const attendeeName = order?.attendee_name || 'Guest Attendee'
-  const reference = order?.reference || 'TSF-DEMO-TICKET'
+  const reference = order?.reference
+  const status = order?.payment_status || 'demo'
+
+  if (!order) {
+    return (
+      <main style={{ minHeight: '100vh', background: '#0F1208', display: 'grid', placeItems: 'center', padding: '80px 20px' }}>
+        <section style={{ maxWidth: 520, background: '#1E2418', border: '.5px solid #2A3020', borderRadius: 8, padding: 34, textAlign: 'center' }}>
+          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.18em', textTransform: 'uppercase', color: '#C8891F', marginBottom: 14 }}>Ticket Recovery</p>
+          <h1 style={{ fontSize: 34, fontFamily: "'Yeseva One',serif", color: '#EFE8D5', marginBottom: 12 }}>Find your ticket</h1>
+          <p style={{ color: '#A89B80', lineHeight: 1.7, marginBottom: 24 }}>For privacy, tickets are opened with the ticket reference and checkout email. Use Find Ticket to recover yours.</p>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button onClick={() => onNav('lookup')} style={{ background: '#C8891F', color: '#0F1208', border: 'none', borderRadius: 2, padding: '14px 24px', fontSize: 12, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase' }}>Find Ticket</button>
+            <button onClick={() => onNav('events')} style={{ background: 'transparent', color: '#EFE8D5', border: '1px solid rgba(239,232,213,.4)', borderRadius: 2, padding: '14px 24px', fontSize: 12, fontWeight: 700, letterSpacing: '.10em', textTransform: 'uppercase' }}>Browse Events</button>
+          </div>
+        </section>
+      </main>
+    )
+  }
 
   return (
     <main style={{ minHeight: '100vh', background: '#0F1208', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 20px' }}>
@@ -47,6 +66,10 @@ export default function Ticket({ eventId, ticketType, order, onNav }) {
 
             <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '.12em', textTransform: 'uppercase', color: '#A89B80', marginBottom: 6 }}>Ticket ID</p>
             <p style={{ fontFamily: 'monospace', fontSize: 13, color: '#C8891F', letterSpacing: '.08em', marginBottom: 24 }}>{reference}</p>
+            <div style={{ background: '#252C1A', border: '.5px solid #3D5030', borderRadius: 8, padding: 14, marginBottom: 20 }}>
+              <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '.12em', textTransform: 'uppercase', color: '#A89B80', marginBottom: 5 }}>Status</p>
+              <p style={{ fontSize: 13, color: '#EFE8D5', textTransform: 'capitalize' }}>{status}</p>
+            </div>
 
             {/* QR code placeholder */}
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
@@ -83,18 +106,17 @@ export default function Ticket({ eventId, ticketType, order, onNav }) {
 
           {/* Footer */}
           <div style={{ padding: '16px 32px', background: '#161C10', textAlign: 'center' }}>
-            <p style={{ fontSize: 11, color: '#A89B80', letterSpacing: '.08em', marginBottom: 4 }}>Present this ticket at the gate</p>
+          <p style={{ fontSize: 11, color: '#A89B80', letterSpacing: '.08em', marginBottom: 4 }}>Present this ticket at the gate</p>
+            <p style={{ fontSize: 10, color: '#4A5C3E', lineHeight: 1.5 }}>Recover later with ticket ID + checkout email</p>
             <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '.15em', textTransform: 'uppercase', color: '#4A5C3E' }}>Lamide Foods</p>
           </div>
         </div>
 
         {/* Action buttons */}
         <div style={{ display: 'flex', gap: 12, marginTop: 24, justifyContent: 'center' }}>
-          {['Download PDF', 'Share', 'Add to Wallet'].map(label => (
-            <button key={label} style={{ background: '#1E2418', color: '#EFE8D5', border: '.5px solid #3D5030', borderRadius: 2, padding: '12px 20px', fontSize: 12, fontWeight: 600, letterSpacing: '.10em', textTransform: 'uppercase', cursor: 'pointer' }}>
-              {label}
-            </button>
-          ))}
+          <button onClick={() => window.print()} style={{ background: '#1E2418', color: '#EFE8D5', border: '.5px solid #3D5030', borderRadius: 2, padding: '12px 20px', fontSize: 12, fontWeight: 600, letterSpacing: '.10em', textTransform: 'uppercase', cursor: 'pointer' }}>Print</button>
+          <button onClick={() => navigator.share?.({ title: evt.title, text: `Taste & See ticket ${reference}` })} style={{ background: '#1E2418', color: '#EFE8D5', border: '.5px solid #3D5030', borderRadius: 2, padding: '12px 20px', fontSize: 12, fontWeight: 600, letterSpacing: '.10em', textTransform: 'uppercase', cursor: 'pointer' }}>Share</button>
+          <button onClick={() => onNav('lookup')} style={{ background: '#1E2418', color: '#EFE8D5', border: '.5px solid #3D5030', borderRadius: 2, padding: '12px 20px', fontSize: 12, fontWeight: 600, letterSpacing: '.10em', textTransform: 'uppercase', cursor: 'pointer' }}>Recover</button>
         </div>
         <div style={{ textAlign: 'center', marginTop: 16 }}>
           <button onClick={() => onNav('home')} className="nav-lnk" style={{ background: 'none', border: 'none', color: '#A89B80', cursor: 'pointer', fontSize: 13, transition: 'color .2s' }}>← Back to Home</button>

@@ -3,7 +3,7 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
 const ADMIN_EMAILS = (import.meta.env.VITE_ADMIN_EMAILS || '').split(',').map(email => email.trim().toLowerCase()).filter(Boolean)
 
 export const isSupabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY)
-const TABLES = new Set(['orders', 'leads', 'event_checkins'])
+const TABLES = new Set(['orders', 'leads', 'event_checkins', 'events'])
 
 function getSession() {
   return JSON.parse(localStorage.getItem('tsf:session') || 'null')
@@ -71,11 +71,98 @@ export async function listRows(table) {
   return response.json()
 }
 
+export async function findRows(table, filters = {}) {
+  assertTable(table)
+  if (!isSupabaseConfigured) {
+    const rows = JSON.parse(localStorage.getItem(`tsf:${table}`) || '[]')
+    return rows.filter(row => Object.entries(filters).every(([key, value]) => {
+      if (!value) return true
+      return String(row[key] || '').toLowerCase() === String(value).toLowerCase()
+    }))
+  }
+
+  const params = new URLSearchParams({ select: '*' })
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value) params.set(key, `eq.${value}`)
+  })
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${params.toString()}`, {
+    headers: authHeaders(),
+  })
+
+  if (!response.ok) {
+    throw new Error(`Could not search ${table}: ${await response.text()}`)
+  }
+
+  return response.json()
+}
+
+export async function rpc(name, payload = {}) {
+  if (!isSupabaseConfigured) {
+    throw new Error('RPC calls require Supabase configuration.')
+  }
+
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify(payload),
+  })
+
+  if (!response.ok) {
+    throw new Error(`RPC ${name} failed: ${await response.text()}`)
+  }
+
+  return response.json()
+}
+
+export async function invokeFunction(name, payload = {}) {
+  if (!isSupabaseConfigured) {
+    return { ok: false, skipped: true, message: 'Supabase functions are not configured.' }
+  }
+
+  const response = await fetch(`${SUPABASE_URL}/functions/v1/${name}`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify(payload),
+  })
+
+  if (!response.ok) {
+    throw new Error(`Function ${name} failed: ${await response.text()}`)
+  }
+
+  return response.json()
+}
+
+export async function uploadEventImage(file) {
+  if (!isSupabaseConfigured || !file) return null
+
+  const ext = file.name.split('.').pop() || 'jpg'
+  const filename = `${crypto.randomUUID()}.${ext}`.toLowerCase()
+  const path = `events/${filename}`
+
+  const session = getSession()
+  const response = await fetch(`${SUPABASE_URL}/storage/v1/object/event-images/${path}`, {
+    method: 'POST',
+    headers: {
+      apikey: SUPABASE_ANON_KEY || '',
+      Authorization: `Bearer ${session?.access_token || SUPABASE_ANON_KEY || ''}`,
+      'Content-Type': file.type || 'application/octet-stream',
+      'x-upsert': 'true',
+    },
+    body: file,
+  })
+
+  if (!response.ok) {
+    throw new Error(`Image upload failed: ${await response.text()}`)
+  }
+
+  return `${SUPABASE_URL}/storage/v1/object/public/event-images/${path}`
+}
+
 export async function signUp({ name, email, phone, password }) {
   if (!isSupabaseConfigured) {
     const user = { name, email, phone, role: isAdminEmail(email) ? 'admin' : 'guest' }
     localStorage.setItem('tsf:user', JSON.stringify(user))
-    return { user }
+    return { user, needsConfirmation: false }
   }
 
   const response = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
@@ -93,10 +180,13 @@ export async function signUp({ name, email, phone, password }) {
   }
 
   const session = await response.json()
-  if (session.access_token) localStorage.setItem('tsf:session', JSON.stringify(session))
   const user = normalizeUser(session.user, { name, email, phone })
+  if (!session.access_token) {
+    return { user, session, needsConfirmation: true }
+  }
+  localStorage.setItem('tsf:session', JSON.stringify(session))
   localStorage.setItem('tsf:user', JSON.stringify(user))
-  return { user, session }
+  return { user, session, needsConfirmation: false }
 }
 
 export async function signIn({ email, password }) {
@@ -114,7 +204,9 @@ export async function signIn({ email, password }) {
   })
 
   if (!response.ok) {
-    throw new Error('Invalid email or password.')
+    const body = await response.json().catch(() => ({}))
+    const message = body.error_description || body.msg || body.error || 'Invalid email or password.'
+    throw new Error(message.includes('Email not confirmed') ? 'Please confirm your email address first, then sign in.' : message)
   }
 
   const session = await response.json()
